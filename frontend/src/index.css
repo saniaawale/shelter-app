@@ -35,12 +35,12 @@
     --text: #061329;
     --text-h: #3e5177;
     --bg: #16171d;
-    --border: #1f38c5;
+    --border: #af8096;
     --code-bg: #437939;
     --accent: #5707a7;
     --accent-bg: rgba(192, 132, 252, 0.15);
     --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
+    --social-bg: rgba(124, 78, 113, 0.5);
     --shadow:
       rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
