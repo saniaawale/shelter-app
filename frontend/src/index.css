@@ -33,9 +33,9 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #bf08c5;
-    --text-h: #d4689b;
+    --text-h: #c582a1;
     --bg: #5e1046;
-    --border: #c96fab88;
+    --border: #b91b8588;
     --code-bg: #b13368;
     --accent: #a82871;
     --accent-bg: rgba(194, 39, 186, 0.932);
