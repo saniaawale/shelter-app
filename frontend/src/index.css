@@ -36,11 +36,11 @@
     --text-h: #d1377f;
     --bg: #e45cbb;
     --border: #bb298a;
-    --code-bg: #7a1e44;
+    --code-bg: #9b0d48;
     --accent: #8a1254;
     --accent-bg: rgba(54, 34, 51, 0.932);
-    --accent-border: rgba(189, 49, 154, 0.774);
-    --social-bg: rgba(233, 41, 188, 0.952);
+    --accent-border: rgba(49, 21, 42, 0.63);
+    --social-bg: rgba(76, 14, 134, 0.952);
     --shadow:
       rgba(0, 0, 0, 0.774) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
