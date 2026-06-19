@@ -4,6 +4,14 @@ import '@testing-library/jest-dom/vitest'
 import App from '../App'
 import { AuthContext } from '../context/authcontext.js'
 
+vi.mock('../lib/supabase', () => ({
+  supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn().mockResolvedValue({ data: [], error: null }),
+    })),
+  },
+}))
+
 vi.mock('../components/LoginSignup', () => ({
   default: () => <h1>Login form</h1>,
 }))
