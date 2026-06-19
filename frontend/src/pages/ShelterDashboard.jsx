@@ -1,0 +1,58 @@
+import { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabase'
+
+    export default function ShelterDashboard() {
+    const [cats, setCats] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState('')
+
+    useEffect(() => {
+        let cancelled = false
+
+        async function loadCats() {
+        try {
+            const { data, error } = await supabase
+            .from('Cat Profiles')
+            .select('id, Name, Age_group, availability_status')
+
+            if (error) throw error
+
+            if (!cancelled) setCats(data ?? [])
+        } catch {
+            if (!cancelled) setError('Could not load cats. Please try again.')
+        } finally {
+            if (!cancelled) setLoading(false)
+        }
+        }
+
+        loadCats()
+
+        return () => {
+        cancelled = true
+        }
+    }, [])
+
+    return (
+        <main>
+        <h1>Shelter dashboard</h1>
+
+        {loading ? (
+            <p role="status">Loading cats…</p>
+        ) : error ? (
+            <p role="alert">{error}</p>
+        ) : cats.length === 0 ? (
+            <p>No cat records are available to your account.</p>
+        ) : (
+            <ul>
+            {cats.map(cat => (
+                <li key={cat.id}>
+                {cat.Name} — {cat.Age_group || 'Age unknown'}
+                {' — '}
+                {cat.availability_status || 'Availability unknown'}
+                </li>
+            ))}
+            </ul>
+        )}
+        </main>
+    )
+}

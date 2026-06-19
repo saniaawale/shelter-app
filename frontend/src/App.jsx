@@ -7,6 +7,7 @@ import lightCloud from './assets/light_cloud.png'
 import Home from './components/Home'
 import LoginSignup from './components/LoginSignup'
 import { AuthContext } from './context/authcontext.js'
+import ShelterDashboard from './pages/ShelterDashboard.jsx'
 
 const requiredRoles = {
   quiz: 'adopter',
@@ -84,12 +85,7 @@ function App() {
   }
 
   if (page === 'shelter-dashboard') {
-    return (
-      <main>
-        <h1>Shelter dashboard</h1>
-        <p>Your shelter tools will appear here.</p>
-      </main>
-    )
+  return <ShelterDashboard />
   }
 
   if (page === 'quiz') {
