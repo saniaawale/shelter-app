@@ -34,13 +34,13 @@
   :root {
     --text: #bf08c5;
     --text-h: #d1377f;
-    --bg: #e45cbb;
+    --bg: #5e1046;
     --border: #e92daa88;
     --code-bg: #b13368;
     --accent: #1f0614;
     --accent-bg: rgba(194, 39, 186, 0.932);
     --accent-border: rgb(202, 32, 160);
-    --social-bg: rgba(76, 14, 134, 0.952);
+    --social-bg: rgba(221, 32, 127, 0.952);
     --shadow:
       rgba(0, 0, 0, 0.774) 0 10px 15px -3px, rgba(133, 50, 50, 0.25) 0 4px 6px -2px;
   }
