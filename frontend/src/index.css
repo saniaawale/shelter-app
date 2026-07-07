@@ -35,11 +35,11 @@
     --text: #bf08c5;
     --text-h: #d1377f;
     --bg: #e45cbb;
-    --border: #bb298a;
+    --border: #e92daa88;
     --code-bg: #a13663;
     --accent: #1f0614;
-    --accent-bg: rgba(75, 34, 69, 0.932);
-    --accent-border: rgba(104, 16, 82, 0.63);
+    --accent-bg: rgba(194, 39, 186, 0.932);
+    --accent-border: rgb(202, 32, 160);
     --social-bg: rgba(76, 14, 134, 0.952);
     --shadow:
       rgba(0, 0, 0, 0.774) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
