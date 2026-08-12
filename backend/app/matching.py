@@ -63,7 +63,7 @@ def match_cats(
 
     for cat in cats:
         # Availability must be  confirmed before a cat is considered.
-        if cat.archived or not cat.available :
+        if cat.archived or not cat.available or not cat.availability_confirmed:
             continue
 
         # Restrictions are supplied explicitly by staff; preferences never create them.
@@ -73,7 +73,7 @@ def match_cats(
         score = 0
         reasons = []
         considerations = []
-        if not cat.placement_requirements_unknown:
+        if not cat.placement_requirements_known:
             considerations.append("Needs confirmation: shelter placement requirements.")
 
         if preferences["preferred_age_group"] is None:

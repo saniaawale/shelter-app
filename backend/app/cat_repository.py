@@ -1,7 +1,7 @@
 """ read postgres records and traslate them for the matching engine"""
 
 import os
-from pathlib import path 
+from pathlib import Path
 
 import psycopg
 from dotenv import load_dotenv
@@ -12,7 +12,7 @@ from .preferences import AGE_MAP, STYLE_MAP
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")  # load settings from .env file
 
-class CatDataUnavailableError(Exception):
+class CatDataUnavailable(Exception):
     """Raised when the cat data is unavailable from the database"""
     pass
 
@@ -23,20 +23,21 @@ def row_to_candidate(row: dict,available_status: str) -> CatCandidate:
     """Use recorded structured values"""
     age = row.get("age_group")
     style = row.get("companionship_style")
-    care = row.get("care_status")
-    status_confirmed = row.get("availability_confirmed") == available_status
+    care = row.get("special_needs")
+    status_confirmed = row.get("availability_status") == available_status
     
     
     return CatCandidate(
         source_record_id = str(row["source_record_id"]),
         name=row.get("Name") or "Unnamed Cat",
         available= status_confirmed,
-        archived=row["archived"],
-        age_group=AGE_MAP.get(age) if age in AGE_MAP.values() else None,
-        companionship_style=STYLE_MAP.get(style) if style in STYLE_MAP.values() else None,
+        availability_confirmed=status_confirmed,
+        archived=row.get("archived_at") is not None,
+        age_group=age if age in AGE_MAP.values() else None,
+        companionship_style=style if style in STYLE_MAP.values() else None,
         good_with_dogs=compatibility(row["good_with_dogs"]),
         good_with_cats=compatibility(row["good_with_cats"]),
-        good_with_children=compatibility(row["good_with_children"]),
+        good_with_children=compatibility(row["good_with_kids"]),
         # blank notes cant confirm that the cat has no care needs
         care_status="documented" if care and care.lower() != "unknown" else "unknown",
         joint_adoption_required=None,
@@ -47,7 +48,7 @@ def load_cat_candidates() -> list[CatCandidate]:
     database_url = os.getenv("DATABASE_URL","").strip()
     available_status = os.getenv("MATCHING_AVAILABLE_STATUS", "").strip()
     if not database_url or not available_status:
-        raise CatDataUnavailableError("Matching database configuration is incomplete")
+        raise CatDataUnavailable("Matching database configuration is incomplete")
     
     try:
         with psycopg.connect(database_url, connect_timeout = 5, sslmode = "require", row_factory=dict_row) as connection:
