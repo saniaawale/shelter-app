@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field
 
 
 class QuizAnswers(BaseModel):
-    readiness: str = Field(min_length=1, max_length=500)
-    environment: str = Field(min_length=1, max_length=500)
+    readiness: Literal["Ready now", "Within 1 month", "Within 3 months", "Just exploring"]
+    environment: Literal["Quiet", "Moderately active", "Very active"]
 
     household: list[Literal[
         "Dog(s)",

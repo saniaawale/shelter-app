@@ -78,8 +78,7 @@ def match_cats(
 
         if preferences["preferred_age_group"] is None:
             # Any age accepts known and unknown ages equally; it does not assert a known age.
-            score += weights.age
-            reasons.append("Matches your any-age preference; no age restriction applied.")
+            reasons.append("No age preference; no age points awarded.")
         elif cat.age_group in (None, "", "unknown"):
             considerations.append("Needs confirmation: age group.")
         elif preferences["preferred_age_group"] == cat.age_group:

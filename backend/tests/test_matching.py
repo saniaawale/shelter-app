@@ -9,7 +9,7 @@ from backend.app.models import QuizAnswers
 def make_answers(**changes):
     """Valid synthetic adopter answers; no real account or personal data."""
     values = {
-        "readiness": "Next month", "environment": "Quiet household",
+        "readiness": "Within 1 month", "environment": "Quiet",
         "household": [], "experience": "Somewhat experienced",
         "temperaments": ["Lap cat"], "age": "Young adult (2-4 years)",
         "care": "Very open", "count": "1",
@@ -97,11 +97,11 @@ class MatchCatsTests(unittest.TestCase):
                 cat = replace(SYNTHETIC_CATS[0], age_group=age)
                 # Submit the explicit any-age choice rather than a specific age group.
                 result = match_cats(make_answers(age="Any age is a good age!"), [cat])
-                # All ages receive equal age points and missing age alone causes no warning.
-                self.assertEqual(result["matches"][0]["score"], 5)
+                # Only companionship earns points; missing age alone causes no warning.
+                self.assertEqual(result["matches"][0]["score"], 3)
                 self.assertEqual(result["matches"][0]["considerations"], [])
                 self.assertEqual(result["needs_confirmation"], [])
-                self.assertIn("Matches your any-age preference; no age restriction applied.", result["matches"][0]["reasons"])
+                self.assertIn("No age preference; no age points awarded.", result["matches"][0]["reasons"])
 
     # Checks a specific age preference still leaves a cat with unknown age unresolved.
     def test_specific_age_keeps_unknown_age_unresolved(self):

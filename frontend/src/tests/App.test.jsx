@@ -83,9 +83,10 @@ describe('protected pages', () => {
 describe('public adopter pages and private bookmarks', () => {
   // Checks guest answers survive quiz-to-matches navigation and the Retake quiz action.
   it('restores quiz answers after matches and Retake quiz', () => {
+    // Complete the guest quiz using the newly approved readiness/environment radios.
     renderPage('/quiz', {})
-    fireEvent.change(screen.getByLabelText('When would you be ready to adopt?'), { target: { value: 'Next month' } })
-    fireEvent.change(screen.getByLabelText('What kind of environment is your household like?'), { target: { value: 'Quiet' } })
+    fireEvent.click(screen.getByRole('radio', { name: 'Within 1 month', exact: true }))
+    fireEvent.click(screen.getByRole('radio', { name: 'Quiet', exact: true }))
     for (const value of ['Cat(s)', 'Somewhat experienced', 'Lap cat', 'Any age is a good age!', 'Very open', '1']) {
       fireEvent.click(screen.getByLabelText(value, { exact: true }))
     }
@@ -94,9 +95,10 @@ describe('public adopter pages and private bookmarks', () => {
     expect(window.location.pathname).toBe('/matches')
     expect(screen.getByRole('heading', { name: 'Your cat matches' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Retake quiz' }))
+    // Returning from matches must restore the selected options rather than typed inputs.
     expect(window.location.pathname).toBe('/quiz')
-    expect(screen.getByLabelText('When would you be ready to adopt?')).toHaveValue('Next month')
-    expect(screen.getByLabelText('What kind of environment is your household like?')).toHaveValue('Quiet')
+    expect(screen.getByRole('radio', { name: 'Within 1 month', exact: true })).toBeChecked()
+    expect(screen.getByRole('radio', { name: 'Quiet', exact: true })).toBeChecked()
     expect(screen.getByLabelText('Cat(s)', { exact: true })).toBeChecked()
     expect(screen.getByLabelText('Lap cat', { exact: true })).toBeChecked()
   })

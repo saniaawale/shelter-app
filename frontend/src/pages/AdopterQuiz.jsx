@@ -4,8 +4,8 @@ import {loadQuizAnswers, saveQuizAnswers} from '../lib/guestQuiz'
 
 
 const questions = [
-  { id: 'readiness', text: 'When would you be ready to adopt?', placeholder: 'Immediately!', help: "We ask that all potential adopters inquire once they're ready to adopt; as we cannot guarantee availability for any given cat" },
-  { id: 'environment', text: 'What kind of environment is your household like?', placeholder: 'Moderately active' },
+  { id: 'readiness', text: 'When would you be ready to adopt?', options: ['Ready now', 'Within 1 month', 'Within 3 months', 'Just exploring'], help: "We ask that all potential adopters inquire once they're ready to adopt; as we cannot guarantee availability for any given cat" },
+  { id: 'environment', text: 'What kind of environment is your household like?', options: ['Quiet', 'Moderately active', 'Very active'] },
   { id: 'household', text: 'Do you currently have any of the following in your household?', multiple: true, options: ['Dog(s)', 'Cat(s)', 'Children'] },
   { id: 'experience', text: "What's your experience level with cats?", options: ['Very experienced', 'Somewhat experienced', 'No experience'] },
   { id: 'temperaments', text: 'Which of the following temperaments would you be open to?', multiple: true, options: ['Lap cat', 'Likes to be near but not on me', 'Allows pets but is independent', 'A little sassy and fesity', 'Spirit cat'] },
@@ -34,6 +34,13 @@ export default function AdopterQuiz({ onHome, onViewMatches }) {
 
   function review(event) {
     event.preventDefault()
+    for (const question of questions.slice(0, 2)) {
+      if (!question.options.includes(answers[question.id])) {
+        setError('Please select an option for readiness and household environment.')
+        document.getElementById(`${question.id}-0`)?.focus()
+        return
+      }
+    }
     if (!answers.temperaments.length) {
       setError('Select at least one temperament you would be open to.')
       document.getElementById('temperaments-0')?.focus()

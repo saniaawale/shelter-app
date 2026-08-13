@@ -8,8 +8,8 @@ from backend.app.preferences import normalize_preferences
 def make_answers(**changes):
     """Build valid synthetic quiz answers, replacing only what a test needs."""
     values = {
-        "readiness": "Next month",
-        "environment": "Quiet household",
+        "readiness": "Within 1 month",
+        "environment": "Quiet",
         "household": [],
         "experience": "Somewhat experienced",
         "temperaments": ["Lap cat"],
