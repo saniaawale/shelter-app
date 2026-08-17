@@ -5,7 +5,7 @@ import Matches from '../pages/Matches'
 import { loadQuizAnswers, saveQuizAnswers } from '../lib/guestQuiz'
 
 const answers = {
-    readiness: 'Next month', environment: 'Quiet', household: [],
+    readiness: 'Within 1 month', environment: 'Quiet', household: [],
     experience: 'Somewhat experienced', temperaments: ['Lap cat'],
     age: 'Any age is a good age!', care: 'Very open', count: '1',
 }
@@ -79,10 +79,11 @@ it('recovers from service failure without losing quiz answers', async () => {
 })
 
 // Checks validation failures, invalid response shapes, and network failures all allow recovery.
-it.each(['validation', 'malformed', 'network'])('handles %s errors safely', async kind => {
+it.each(['validation', 'malformed', 'invalid-reasons', 'network'])('handles %s errors safely', async kind => {
   // Simulate each transport failure without depending on a running backend.
     if (kind === 'validation') fetch.mockResolvedValue({ ok: false, status: 422 })
     if (kind === 'malformed') fetch.mockResolvedValue(response({ matches: [{}], needs_confirmation: [] }))
+    if (kind === 'invalid-reasons') fetch.mockResolvedValue(response({ matches: [{ ...cat('a', 'Test Cat', 3), reasons: [{}] }], needs_confirmation: [] }))
     if (kind === 'network') fetch.mockRejectedValue(new TypeError('private transport detail'))
     render(<Matches quizAnswers={answers} navigate={vi.fn()} />)
   // Users see a safe message and retry rather than raw exceptions or a crashed screen.

@@ -3,9 +3,10 @@ import { loadQuizAnswers } from '../lib/guestQuiz'
 import { fetchMatches, hasQuizAnswers } from '../lib/matchingApi'
 
 
-export default function Matches({ navigate }) {
+export default function Matches({ navigate, quizAnswers }) {
 
-  const [answers] = useState(loadQuizAnswers)
+  const [savedAnswers] = useState(loadQuizAnswers)
+  const answers = quizAnswers ?? savedAnswers
   const [results, setResults] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -18,6 +19,15 @@ export default function Matches({ navigate }) {
 
     const controller = new AbortController()
     let active = true
+    let timedOut = false
+    const timeout = setTimeout(() => {
+      timedOut = true
+      controller.abort()
+      if (active) {
+        setError('Finding matches took too long. Please try again.')
+        setLoading(false)
+      }
+    }, 15000)
 
     async function loadMatches() {
       setLoading(true)
@@ -26,14 +36,15 @@ export default function Matches({ navigate }) {
     try {
       const data = await fetchMatches(answers,controller.signal)
 
-      if (active){
+      if (active && !timedOut){
         setResults(data)
       }
-    } catch(err) {
-      if (active) {
-        setError(err.message || 'Could not load cat matches')
+    } catch {
+      if (active && !timedOut) {
+        setError('Could not load cat matches. Please try again, or retake the quiz to check your answers.')
       }
     }finally {
+      clearTimeout(timeout)
       if ( active ) {
         setLoading(false)
       }
@@ -44,6 +55,7 @@ export default function Matches({ navigate }) {
 
   return() => {
     active = false
+    clearTimeout(timeout)
     controller.abort()
   }
 }, [answers, complete, attempt])
@@ -52,7 +64,7 @@ function renderCats(cats){
   return cats.map(cat => (
         <article key={cat.source_record_id}>
         <h3>{cat.name}</h3>
-        <p>{cat.score} preference points</p>
+        <p>{cat.score} points</p>
 
         <ul>
           {cat.reasons.map((reason, index) => (
@@ -92,7 +104,7 @@ function renderCats(cats){
         </p>
 
         {!complete && (
-          <p>Please complete the quiz to see your matches.</p>
+          <p role="status">Complete the quiz to see your matches.</p>
         )}
 
         {loading && <p role="status">Finding your cat matches…</p>}
@@ -112,22 +124,22 @@ function renderCats(cats){
         {!loading && !error && results && (
           <>
             {results.matches.length > 0 && (
-              <section>
-                <h2>Matches</h2>
+              <section aria-labelledby="preference-matches-heading">
+                <h2 id="preference-matches-heading">Preference matches</h2>
                 {renderCats(results.matches)}
               </section>
             )}
 
             {results.needs_confirmation.length > 0 && (
-              <section>
-                <h2>Needs confirmation</h2>
+              <section aria-labelledby="confirmation-heading">
+                <h2 id="confirmation-heading">Needs confirmation</h2>
                 {renderCats(results.needs_confirmation)}
               </section>
             )}
 
             {results.matches.length === 0 &&
               results.needs_confirmation.length === 0 && (
-                <p>No suitable cats were found for these answers.</p>
+                <p role="status">No eligible cats were returned for these answers.</p>
               )}
           </>
         )}
@@ -138,6 +150,9 @@ function renderCats(cats){
           onClick={() => navigate('quiz')}
         >
           Retake quiz
+        </button>
+        <button className="outline-button" type="button" onClick={() => navigate('adopter-dashboard')}>
+          My bookmarks
         </button>
       </section>
     </main>

@@ -81,6 +81,29 @@ describe('protected pages', () => {
 })
 
 describe('public adopter pages and private bookmarks', () => {
+  // Checks the complete guest journey works when browser storage cannot save any answers.
+  it('passes quiz answers to matches and back while storage is blocked', async () => {
+    // Keep the transport mocked and make both browser-storage operations fail.
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('Blocked') })
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Blocked') })
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true, json: async () => ({ matches: [], needs_confirmation: [] }),
+    })
+    renderPage('/quiz', {})
+    // Complete and review the quiz with no authenticated account or stored fallback.
+    for (const value of ['Within 1 month', 'Quiet', 'Somewhat experienced', 'Lap cat', 'Any age is a good age!', 'Very open', '1']) {
+      fireEvent.click(screen.getByLabelText(value, { exact: true }))
+    }
+    fireEvent.click(screen.getByRole('button', { name: /Review my answers/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'View matches' }))
+    // The request must contain the in-memory answers and finish with a valid empty state.
+    expect(await screen.findByText(/No eligible cats were returned/)).toBeInTheDocument()
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({ readiness: 'Within 1 month', environment: 'Quiet' })
+    fireEvent.click(screen.getByRole('button', { name: 'Retake quiz' }))
+    // Retaking restores the memory copy despite storage remaining unavailable.
+    expect(screen.getByRole('radio', { name: 'Within 1 month', exact: true })).toBeChecked()
+    expect(screen.getByRole('radio', { name: 'Quiet', exact: true })).toBeChecked()
+  })
   // Checks guest answers survive quiz-to-matches navigation and the Retake quiz action.
   it('restores quiz answers after matches and Retake quiz', () => {
     // Complete the guest quiz using the newly approved readiness/environment radios.

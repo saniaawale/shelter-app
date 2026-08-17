@@ -32,6 +32,7 @@ function SleepingCat() {
 }
 
 function App() {
+  const [quizAnswers, setQuizAnswers] = useState(null)
   const { user, role, loading, error } = useContext(AuthContext)
   const [page, setPage] = useState(
     () => window.location.pathname.replace('/', '') || 'home'
@@ -88,11 +89,14 @@ function App() {
   }
 
   if (page === 'quiz') {
-    return <AdopterQuiz onHome={() => navigate('home')} onViewMatches={() => navigate('matches')} />
+    return <AdopterQuiz initialAnswers={quizAnswers} onHome={() => navigate('home')} onViewMatches={answers => {
+      setQuizAnswers(answers)
+      navigate('matches')
+    }} />
   }
 
   if (page === 'matches') {
-    return <Matches navigate={navigate} />
+    return <Matches quizAnswers={quizAnswers} navigate={navigate} />
   }
 
   if (page === 'adopter-dashboard') {
