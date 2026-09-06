@@ -73,7 +73,7 @@ def match_cats(
         score = 0
         reasons = []
         considerations = []
-        if not cat.placement_requirements_known:
+        if not cat.placement_requirements_unknown:
             considerations.append("Needs confirmation: shelter placement requirements.")
 
         if preferences["preferred_age_group"] is None:
