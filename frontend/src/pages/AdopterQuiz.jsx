@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import QuizPage from './QuizPage'
+import QuizPage from '../components/QuizPage'
 
 
 const questions = [
@@ -54,3 +54,4 @@ export default function AdopterQuiz({ onHome }) {
 
   
 }
+
