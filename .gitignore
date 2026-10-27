@@ -1,5 +1,6 @@
 node_modules/
-frontend/dist/
-backend/.venv/
-backend/__pycache__/
-backend/.env
+dist/
+.venv/
+__pycache__/
+*.py[cod]
+.env
