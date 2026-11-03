@@ -1,111 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Titan+One&display=swap');
+
 :root {
-  --text: #ee3fe5;
-  --text-h: #911963;
-  --bg: #ad57a5;
-  --border: #e728c7;
-  --code-bg: #c41fae;
-  --accent: #dfccd9;
-  --accent-bg: rgba(158, 67, 137, 0.897);
-  --accent-border: rgb(92, 27, 86);
-  --social-bg: rgba(202, 40, 167, 0.815);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace , mono;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  font-optical-sizing: auto;
+  font-weight: 400;
+  --round: 'Titan One', 'Nunito', sans-serif;
+  --body: 'Nunito', 'Segoe UI', sans-serif;
+  --page: #fff9f7;
+  --section: #fff2ef;
+  --auth-bg: #fbe3e7;
+  --surface: #fffdfc;
+  --input-bg: #fffaf8;
+  --ink: #462a39;
+  --muted-ink: #876b79;
+  --placeholder: #b5a0aa;
+  --line: #efdae0;
+  --berry: #b54770;
+  --berry-deep: #943552;
+  --soft-pink: #f6cdd7;
+  --soft-lilac: #e8dafa;
+  --lilac-ink: #8465a7;
+  --soft-yellow: #f8e6a9;
+  --yellow-ink: #a57e20;
+  --cat-fur: #9b5d78;
+  --cat-face: #fff5f5;
+  --notice-bg: #f8eef0;
+    color: var(--ink);
+  background: var(--page);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #d42ebe;
-    --text-h: #e986b4;
-    --bg: #a72580;
-    --border: #be2490ce;
-    --code-bg: #dfc3d9;
-    --accent: #97396d;
-    --accent-bg: rgba(216, 97, 200, 0.932);
-    --accent-border: rgb(212, 94, 183);
-    --social-bg: rgba(189, 50, 154, 0.952);
-    --shadow:
-      rgba(0, 0, 0, 0.774) 0 10px 15px -3px, rgba(133, 50, 50, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --page: #241d27;
+  --section: #2c2330;
+  --auth-bg: #30232f;
+  --surface: #392d3b;
+  --input-bg: #302732;
+  --ink: #f8eaf0;
+  --muted-ink: #c2aebb;
+  --placeholder: #927f8d;
+  --line: #564454;
+  --berry: #df83a5;
+  --berry-deep: #c7658b;
+  --soft-pink: #583847;
+  --soft-lilac: #473953;
+  --lilac-ink: #c3a5e7;
+  --soft-yellow: #514533;
+  --yellow-ink: #e5c476;
+  --cat-fur: #e5a2ba;
+  --cat-face: #402d39;
+  --notice-bg: #443541;
+  color-scheme: dark;
 }
 
-body {
-  margin: 0;
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 120%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1034px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
-}
+* { box-sizing: border-box; }
+html { min-width: 320px; scroll-behavior: smooth; }
+body { min-width: 320px; min-height: 100vh; margin: 0; }
+button, input { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+::selection { color: #fff; background: #b54770; }
