@@ -29,32 +29,8 @@
   --cat-fur: #9b5d78;
   --cat-face: #fff5f5;
   --notice-bg: #f8eef0;
-    color: var(--ink);
+  color: var(--ink);
   background: var(--page);
-}
-
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --page: #241d27;
-  --section: #2c2330;
-  --auth-bg: #30232f;
-  --surface: #392d3b;
-  --input-bg: #302732;
-  --ink: #f8eaf0;
-  --muted-ink: #c2aebb;
-  --placeholder: #927f8d;
-  --line: #564454;
-  --berry: #df83a5;
-  --berry-deep: #c7658b;
-  --soft-pink: #583847;
-  --soft-lilac: #473953;
-  --lilac-ink: #c3a5e7;
-  --soft-yellow: #514533;
-  --yellow-ink: #e5c476;
-  --cat-fur: #e5a2ba;
-  --cat-face: #402d39;
-  --notice-bg: #443541;
-  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
