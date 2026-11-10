@@ -7,6 +7,7 @@ export default function CatEditForm({ cat, onSaved, onCancel }) {
     const [fosters, setFosters] = useState([])
     const [fostersLoading, setFostersLoading] = useState(true)
     const [fostersError, setFostersError] = useState('')
+    const [selectedFosterId, setSelectedFosterId] = useState(cat.foster_id ?? '')
 
     useEffect(() => {
     let cancelled = false
@@ -52,7 +53,7 @@ export default function CatEditForm({ cat, onSaved, onCancel }) {
 
         // Preserve the existing assignment if the directory could not load.
         if (!fostersLoading && !fostersError) {
-        const selectedFoster = form.get('foster_id') || null
+        const selectedFoster = selectedFosterId || null
         const currentFoster =
             cat.foster_id == null ? null : String(cat.foster_id)
 
@@ -148,20 +149,21 @@ export default function CatEditForm({ cat, onSaved, onCancel }) {
         Current foster
         <select
             name="foster_id"
-            defaultValue={cat.foster_id == null ? '' : String(cat.foster_id)}
+            value={selectedFosterId}
+            onChange={event => setSelectedFosterId(event.target.value)}
             disabled={fostersLoading || Boolean(fostersError)}
         >
             <option value="">Unassigned</option>
 
             {cat.foster_id != null &&
-            !fosters.some(foster => String(foster.ID) === String(cat.foster_id)) && (
+            !fosters.some(foster => foster.foster_id === cat.foster_id) && (
                 <option value={String(cat.foster_id)}>
                 Current foster — profile unavailable
                 </option>
             )}
 
             {fosters.map(foster => (
-            <option key={foster.ID} value={String(foster.ID)}>
+            <option key={foster.foster_id} value={foster.foster_id}>
                 {foster.Name}
             </option>
             ))}

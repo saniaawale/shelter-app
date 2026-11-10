@@ -6,19 +6,7 @@ import { supabase } from '../lib/supabase'
 
 vi.mock('../lib/supabase', () => ({ supabase: { from: vi.fn() } }))
 
-supabase.from.mockImplementation(table => {
-  if (table === 'Foster Profiles') {
-    return {
-      select: vi.fn().mockResolvedValue({
-        data: [{ foster_id: 1, Name: 'Test Foster' }],
-        error: null,
-      }),
-    }
-  }
-
-  return { update }
-})
-
+const fosterSelect = vi.fn()
 const single = vi.fn()
 const select = vi.fn(() => ({ single }))
 const eq = vi.fn(() => ({ select }))
@@ -36,7 +24,18 @@ const cat = {
 
 beforeEach(() => {
   vi.clearAllMocks()
-  supabase.from.mockReturnValue({ update })
+  fosterSelect.mockResolvedValue({
+    data: [
+      { foster_id: '11111111-1111-4111-8111-111111111111', Name: 'Test Foster One' },
+      { foster_id: '22222222-2222-4222-8222-222222222222', Name: 'Test Foster Two' },
+    ],
+    error: null,
+  })
+  supabase.from.mockImplementation(table => {
+    if (table === 'Foster Profiles') return { select: fosterSelect }
+    if (table === 'Cat Profiles') return { update }
+    throw new Error('Unexpected test table')
+  })
   single.mockResolvedValue({ data: { ...cat, availability_status: 'Adopted' }, error: null })
 })
 
@@ -58,6 +57,24 @@ function save() {
 }
 
 describe('cat editing', () => {
+  it.each([
+    [null, '11111111-1111-4111-8111-111111111111'],
+    ['11111111-1111-4111-8111-111111111111', '22222222-2222-4222-8222-222222222222'],
+    ['11111111-1111-4111-8111-111111111111', ''],
+  ])('saves foster assignment changes from %s to %s', async (current, next) => {
+    const savedCat = { ...cat, foster_id: next || null }
+    single.mockResolvedValue({ data: savedCat, error: null })
+    const { onSaved } = renderForm({ ...cat, foster_id: current })
+    const dropdown = screen.getByLabelText('Current foster')
+    await waitFor(() => expect(dropdown).toBeEnabled())
+    expect(dropdown).toHaveValue(current || '')
+    fireEvent.change(dropdown, { target: { value: next } })
+    save()
+    await waitFor(() => expect(onSaved).toHaveBeenCalledWith(savedCat))
+    expect(update).toHaveBeenCalledExactlyOnceWith({ foster_id: next || null })
+    expect(fosterSelect).toHaveBeenCalledWith('foster_id, Name')
+  })
+
   it('populates the existing details and leaves unknown care needs blank', () => {
     renderForm()
     expect(screen.getByLabelText('Name')).toHaveValue('Test Cat')
