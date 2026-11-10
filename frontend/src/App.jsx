@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import './App.css'
 import AdopterQuiz from './pages/AdopterQuiz'
 import sleepingCat from './assets/sleeping_cat.png'
@@ -6,6 +6,13 @@ import darkCloud from './assets/dark_cloud.png'
 import lightCloud from './assets/light_cloud.png'
 import Home from './components/Home'
 import LoginSignup from './components/LoginSignup'
+import { AuthContext } from './context/authcontext.js'
+
+const requiredRoles = {
+  quiz: 'adopter',
+  'foster-dashboard': 'foster',
+  'shelter-dashboard': 'shelter',
+}
 
 function SleepingCat() {
   return (
@@ -20,6 +27,7 @@ function SleepingCat() {
 }
 
 function App() {
+  const { user, role, loading, error } = useContext(AuthContext)
   const [page, setPage] = useState(
     () => window.location.pathname.replace('/', '') || 'home'
   )
@@ -42,6 +50,28 @@ function App() {
 
     setPage(nextPage)
     window.scrollTo(0, 0)
+  }
+
+  const requiredRole = requiredRoles[page]
+
+  if (requiredRole) {
+    if (loading) {
+      return <main><p role="status">Checking your account…</p></main>
+    }
+
+    if (!user) {
+      return <LoginSignup key="login" page="login" navigate={navigate} />
+    }
+
+    if (error || role !== requiredRole) {
+      return (
+        <main>
+          <h1>Access unavailable</h1>
+          <p role="alert">{error || 'Your account does not have access to this page.'}</p>
+          <button type="button" onClick={() => navigate('home')}>Back to home</button>
+        </main>
+      )
+    }
   }
 
   if (page === 'foster-dashboard') {
