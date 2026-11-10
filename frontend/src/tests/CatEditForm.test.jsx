@@ -6,6 +6,19 @@ import { supabase } from '../lib/supabase'
 
 vi.mock('../lib/supabase', () => ({ supabase: { from: vi.fn() } }))
 
+supabase.from.mockImplementation(table => {
+  if (table === 'Foster Profiles') {
+    return {
+      select: vi.fn().mockResolvedValue({
+        data: [{ foster_id: 1, Name: 'Test Foster' }],
+        error: null,
+      }),
+    }
+  }
+
+  return { update }
+})
+
 const single = vi.fn()
 const select = vi.fn(() => ({ single }))
 const eq = vi.fn(() => ({ select }))

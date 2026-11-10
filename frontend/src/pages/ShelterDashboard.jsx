@@ -16,7 +16,7 @@ import CatEditForm from '../components/CatEditForm'
         try {
             const { data, error } = await supabase
             .from('Cat Profiles')
-            .select('id, Name, Age_group, personality, special_needs, availability_status')
+            .select('id, Name, Age_group, personality, special_needs, availability_status, foster_id')
 
             if (error) throw error
 
@@ -73,6 +73,9 @@ import CatEditForm from '../components/CatEditForm'
                 {cat.Name} — {cat.Age_group || 'Age unknown'}
                 {' — '}
                 {cat.availability_status || 'Availability unknown'}
+                {cat.foster_id && (
+                    <span> — Foster: {cat.foster_id}</span>
+                )}
                 <button
                     type="button"
                     aria-label={`Edit ${cat.Name}`}

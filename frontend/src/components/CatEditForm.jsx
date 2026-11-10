@@ -1,9 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 export default function CatEditForm({ cat, onSaved, onCancel }) {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
+    const [fosters, setFosters] = useState([])
+    const [fostersLoading, setFostersLoading] = useState(true)
+    const [fostersError, setFostersError] = useState('')
+
+    useEffect(() => {
+    let cancelled = false
+
+    async function loadFosters() {
+        try {
+        const { data, error } = await supabase
+            .from('Foster Profiles')
+            .select('foster_id, Name')
+
+        if (error) throw error
+
+        if (!cancelled) setFosters(data ?? [])
+        } catch {
+        if (!cancelled) {
+            setFostersError('Could not load fosters. Close and reopen the form to retry.')
+        }
+        } finally {
+        if (!cancelled) setFostersLoading(false)
+        }
+    }
+
+    loadFosters()
+
+    return () => {
+        cancelled = true
+    }
+    }, [])
 
     async function handleSubmit(event) {
         event.preventDefault()
@@ -17,6 +48,17 @@ export default function CatEditForm({ cat, onSaved, onCancel }) {
         personality: form.get('personality').trim() || null,
         special_needs: form.get('care').trim() || null,
         availability_status: form.get('status').trim() || null,
+        }
+
+        // Preserve the existing assignment if the directory could not load.
+        if (!fostersLoading && !fostersError) {
+        const selectedFoster = form.get('foster_id') || null
+        const currentFoster =
+            cat.foster_id == null ? null : String(cat.foster_id)
+
+        if (selectedFoster !== currentFoster) {
+            values.foster_id = selectedFoster
+        }
         }
 
         if (!values.Name) {
@@ -45,7 +87,7 @@ export default function CatEditForm({ cat, onSaved, onCancel }) {
             .update(changes)
             .eq('id', cat.id)
             .select(
-            'id, Name, Age_group, personality, special_needs, availability_status'
+            'id, Name, Age_group, personality, special_needs, availability_status, foster_id'
             )
             .single()
 
@@ -101,6 +143,37 @@ export default function CatEditForm({ cat, onSaved, onCancel }) {
                 defaultValue={cat.availability_status ?? ''}
                 />
             </label>
+
+            <label>
+        Current foster
+        <select
+            name="foster_id"
+            defaultValue={cat.foster_id == null ? '' : String(cat.foster_id)}
+            disabled={fostersLoading || Boolean(fostersError)}
+        >
+            <option value="">Unassigned</option>
+
+            {cat.foster_id != null &&
+            !fosters.some(foster => String(foster.ID) === String(cat.foster_id)) && (
+                <option value={String(cat.foster_id)}>
+                Current foster — profile unavailable
+                </option>
+            )}
+
+            {fosters.map(foster => (
+            <option key={foster.ID} value={String(foster.ID)}>
+                {foster.Name}
+            </option>
+            ))}
+        </select>
+        </label>
+
+        {fostersLoading && <p role="status">Loading fosters…</p>}
+        {fostersError && <p role="alert">{fostersError}</p>}
+
+        {!fostersLoading && !fostersError && fosters.length === 0 && (
+        <p>No foster profiles are available for assignment.</p>
+        )}
 
             <button type="submit">
                 {saving ? 'Saving…' : 'Save changes'}
