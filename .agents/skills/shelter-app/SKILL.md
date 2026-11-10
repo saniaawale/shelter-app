@@ -65,6 +65,24 @@ This skill applies to this repository only. Follow the repository's current code
 - Unknown information must not count as a positive or negative match.
 - Keep incomplete candidates distinguishable from confirmed matches.
 
+## Adopter journey
+
+- The adopter flow is sign up → complete the quiz → view matches.
+- From matches, adopters can optionally bookmark cats or retake the
+  quiz to update their preferences and view new matches.
+- Adopters can return to their bookmarks later, select a cat, and
+  fill out an adoption form for that cat.
+- Keep bookmarking separate from applying: saving a match does not
+  submit an adoption form.
+
+## Foster and shelter login
+
+- Foster and shelter buttons lead directly to login, rather than
+  entering the adopter signup and quiz flow.
+- Fosters and shelter users receive separate login links through
+  email. Setting up those email login links is deferred until later;
+  do not implement that delivery flow unless requested.
+
 ## Adopter quiz and preference scoring
 
 - Ask about preferred age groups and companionship styles,

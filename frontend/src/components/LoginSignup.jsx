@@ -54,8 +54,25 @@ export default function LoginSignup({ page, navigate }) {
             }
 
             if (data.session) {
-                navigate('dashboard')
-            }
+                const {data: roleRecord, error: roleError} = await supabase.from('user_roles').select('role').eq('user_id', data.user.id).single()
+                if (roleError) {
+                    setNotice('Couldn’t connect. Please try again.')
+                    return
+                }
+                switch (roleRecord.role) {
+                    case 'adopter':
+                        navigate('quiz')
+                    break
+                    case 'foster':
+                        navigate('foster-dashboard')
+                    break
+                    case 'shelter':
+                        navigate('shelter-dashboard')
+                    break
+                    default:
+                        setNotice('Your account role needs setup. Contact your shelter.')
+                    }
+                }
             } catch {
             setNotice('Couldn’t connect. Please try again.')
             }
