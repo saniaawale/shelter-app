@@ -49,6 +49,17 @@ import CatEditForm from '../components/CatEditForm'
         <main>
         <h1>Shelter dashboard</h1>
 
+        {notice && <p role="status">{notice}</p>}
+
+        {editingCat && (
+            <CatEditForm
+                key={editingCat.id}
+                cat={editingCat}
+                onSaved={handleSaved}
+                onCancel={() => setEditingCat(null)}
+            />
+        )}
+
         {loading ? (
             <p role="status">Loading cats…</p>
         ) : error ? (
@@ -62,6 +73,17 @@ import CatEditForm from '../components/CatEditForm'
                 {cat.Name} — {cat.Age_group || 'Age unknown'}
                 {' — '}
                 {cat.availability_status || 'Availability unknown'}
+                <button
+                    type="button"
+                    aria-label={`Edit ${cat.Name}`}
+                    disabled={editingCat !== null}
+                    onClick={() => {
+                        setNotice('')
+                        setEditingCat(cat)
+                    }}
+                >
+                    Edit
+                </button>
                 </li>
             ))}
             </ul>
