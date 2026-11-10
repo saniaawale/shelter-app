@@ -45,7 +45,7 @@ describe('shelter cat records', () => {
     expect(items[1]).toHaveTextContent('Test Cat — Senior — Pending')
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
     expect(supabase.from).toHaveBeenCalledWith('Cat Profiles')
-    expect(select).toHaveBeenCalledWith('id, Name, Age_group, availability_status')
+    expect(select).toHaveBeenCalledWith('id, Name, Age_group, personality, special_needs, availability_status')
   })
 
   it('keeps missing age and availability explicitly unknown', async () => {

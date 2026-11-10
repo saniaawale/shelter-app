@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import CatEditForm from '../components/CatEditForm'
 
     export default function ShelterDashboard() {
     const [cats, setCats] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const [editingCat, setEditingCat] = useState(null)
+    const [notice, setNotice] = useState('')
 
     useEffect(() => {
         let cancelled = false
@@ -13,7 +16,7 @@ import { supabase } from '../lib/supabase'
         try {
             const { data, error } = await supabase
             .from('Cat Profiles')
-            .select('id, Name, Age_group, availability_status')
+            .select('id, Name, Age_group, personality, special_needs, availability_status')
 
             if (error) throw error
 
@@ -31,6 +34,16 @@ import { supabase } from '../lib/supabase'
         cancelled = true
         }
     }, [])
+
+    function handleSaved(updatedCat) {
+        setCats(currentCats =>
+            currentCats.map(cat =>
+            cat.id === updatedCat.id ? { ...cat, ...updatedCat } : cat
+            )
+        )
+        setEditingCat(null)
+        setNotice('Cat details saved.')
+    }
 
     return (
         <main>
