@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import CatEditForm from '../components/CatEditForm'
 import CatCreateForm from '../components/CatCreateForm'
+import LinkFosterAccount from '../components/LinkFosterAccount'
 
 export default function ShelterDashboard() {
     const [creating, setCreating] = useState(false)
@@ -93,6 +94,7 @@ export default function ShelterDashboard() {
     return (
         <main>
         <h1>Shelter dashboard</h1>
+        <LinkFosterAccount />
 
         <button
             type="button"

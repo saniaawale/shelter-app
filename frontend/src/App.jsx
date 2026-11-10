@@ -8,6 +8,7 @@ import Home from './components/Home'
 import LoginSignup from './components/LoginSignup'
 import { AuthContext } from './context/authcontext.js'
 import ShelterDashboard from './pages/ShelterDashboard.jsx'
+import FosterDashboard from './pages/FosterDashboard.jsx'
 
 const requiredRoles = {
   quiz: 'adopter',
@@ -76,12 +77,7 @@ function App() {
   }
 
   if (page === 'foster-dashboard') {
-    return (
-      <main>
-        <h1>Foster dashboard</h1>
-        <p>Your foster tools will appear here.</p>
-      </main>
-    )
+    return <FosterDashboard key={user.id} onHome={() => navigate('home')} />
   }
 
   if (page === 'shelter-dashboard') {
