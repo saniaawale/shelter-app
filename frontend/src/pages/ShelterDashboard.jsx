@@ -22,7 +22,7 @@ export default function ShelterDashboard() {
         try {
             const { data, error } = await supabase
             .from('Cat Profiles')
-            .select('id, Name, Age_group, personality, special_needs, availability_status, foster_id, archived_at')
+            .select('source_record_id, Name, age_group, companionship_style, special_needs, availability_status, foster_id, archived_at')
 
             if (error) throw error
 
@@ -44,7 +44,7 @@ export default function ShelterDashboard() {
     function handleSaved(updatedCat) {
         setCats(currentCats =>
             currentCats.map(cat =>
-            cat.id === updatedCat.id ? { ...cat, ...updatedCat } : cat
+            cat.source_record_id === updatedCat.source_record_id ? { ...cat, ...updatedCat } : cat
             )
         )
         setEditingCat(null)
@@ -65,7 +65,7 @@ export default function ShelterDashboard() {
 
     async function changeArchiveState(cat) {
         if (archiveBusyId !== null) return
-        setArchiveBusyId(cat.id)
+        setArchiveBusyId(cat.source_record_id)
         setArchiveError('')
         setNotice('')
 
@@ -73,15 +73,15 @@ export default function ShelterDashboard() {
             const { data, error } = await supabase
                 .from('Cat Profiles')
                 .update({ archived_at: cat.archived_at ? null : new Date().toISOString() })
-                .eq('id', cat.id)
-                .select('id, archived_at')
+                .eq('source_record_id', cat.source_record_id)
+                .select('source_record_id, archived_at')
                 .single()
 
             if (error) throw error
             if (!data) throw new Error('No updated record returned')
 
             setCats(currentCats => currentCats.map(item =>
-                item.id === data.id ? { ...item, ...data } : item
+                item.source_record_id === data.source_record_id ? { ...item, ...data } : item
             ))
             setNotice(cat.archived_at ? 'Cat restored.' : 'Cat archived.')
         } catch {
@@ -133,7 +133,7 @@ export default function ShelterDashboard() {
 
         {editingCat && (
             <CatEditForm
-                key={editingCat.id}
+                key={editingCat.source_record_id}
                 cat={editingCat}
                 onSaved={handleSaved}
                 onCancel={() => setEditingCat(null)}
@@ -149,8 +149,8 @@ export default function ShelterDashboard() {
         ) : (
             <ul>
             {visibleCats.map(cat => (
-                <li key={cat.id}>
-                {cat.Name} — {cat.Age_group || 'Age unknown'}
+                <li key={cat.source_record_id}>
+                {cat.Name} — {cat.age_group || 'Age unknown'}
                 {' — '}
                 {cat.availability_status || 'Availability unknown'}
                 <button
@@ -171,7 +171,7 @@ export default function ShelterDashboard() {
                     disabled={actionBusy}
                     onClick={() => changeArchiveState(cat)}
                 >
-                    {archiveBusyId === cat.id ? 'Saving…' : cat.archived_at ? 'Restore' : 'Archive'}
+                    {archiveBusyId === cat.source_record_id ? 'Saving…' : cat.archived_at ? 'Restore' : 'Archive'}
                 </button>
                 </li>
             ))}

@@ -6,10 +6,11 @@ alter table public."Cat Profiles"
 revoke all privileges on table public."Foster Profiles"
   from public, anon, authenticated;
 revoke select ("Name", "Email", "Password", created_at, foster_id),
-       insert ("Name", "Email", "Password", created_at, foster_id),
-       update ("Name", "Email", "Password", created_at, foster_id),
-       references ("Name", "Email", "Password", created_at, foster_id)
-  on public."Foster Profiles" from public, anon, authenticated;
+        insert ("Name", "Email", "Password", created_at, foster_id),
+        update ("Name", "Email", "Password", created_at, foster_id),
+        references ("Name", "Email", "Password", created_at, foster_id)
+  on public."Foster Profiles" from public, anon, authenticated ;
 grant select (foster_id, "Name")
   on public."Foster Profiles" to authenticated;
 -- Existing shelter-only SELECT policy still controls which users can read.
+-

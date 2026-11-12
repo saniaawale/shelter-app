@@ -6,3 +6,4 @@ __pycache__/
 .env
 /.agents/skills/shelter-app/SKILL.md
 /tmp/
+*.sql

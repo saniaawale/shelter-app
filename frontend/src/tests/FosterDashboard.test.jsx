@@ -9,7 +9,7 @@ vi.mock('../lib/supabase', () => ({ supabase: { from: vi.fn() } }))
 vi.mock('../components/CatImages', () => ({ default: ({ catName }) => <p>Photos for {catName}</p> }))
 
 const profile = { foster_id: 'test-foster', Name: 'Test Foster' }
-const cat = { id: 'test-cat', Name: 'Test Cat', bio: 'Original notes', archived_at: null }
+const cat = { source_record_id: 'test-cat', Name: 'Test Cat', special_needs: 'Original notes', original_foster_description: 'Original description', archived_at: null }
 const maybeSingle = vi.fn()
 const catQuery = vi.fn()
 const single = vi.fn()
@@ -21,7 +21,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   maybeSingle.mockResolvedValue({ data: profile, error: null })
   catQuery.mockResolvedValue({ data: [cat], error: null })
-  single.mockResolvedValue({ data: { ...cat, bio: 'Updated notes' }, error: null })
+  single.mockResolvedValue({ data: { ...cat, special_needs: 'Updated notes' }, error: null })
   signOut.mockResolvedValue(undefined)
   supabase.from.mockImplementation(table => table === 'Foster Profiles'
     ? { select: vi.fn(() => ({ eq: profileEq })) }
@@ -75,25 +75,25 @@ describe('foster dashboard', () => {
   it('opens saved details and photos without exposing status or assignment controls', async () => {
     renderDashboard()
     fireEvent.click(await screen.findByRole('button', { name: 'Update Test Cat' }))
-    expect(screen.getByLabelText('Foster description')).toHaveValue('Original notes')
+    expect(screen.getByLabelText('Care observations')).toHaveValue('Original notes')
     expect(screen.getByText('Photos for Test Cat')).toBeInTheDocument()
     expect(screen.queryByLabelText('Adoption status')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Current foster')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Refresh assigned cats' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Close details' }))
-    expect(screen.queryByLabelText('Foster description')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Care observations')).not.toBeInTheDocument()
   })
 
   it('keeps saved changes when details are reopened', async () => {
     renderDashboard()
     fireEvent.click(await screen.findByRole('button', { name: 'Update Test Cat' }))
-    fireEvent.change(screen.getByLabelText('Foster description'), { target: { value: 'Updated notes' } })
+    fireEvent.change(screen.getByLabelText('Care observations'), { target: { value: 'Updated notes' } })
     fireEvent.click(screen.getByRole('button', { name: 'Save details' }))
     expect(await screen.findByText(/Cat details saved/)).toBeInTheDocument()
-    expect(update).toHaveBeenCalledWith({ bio: 'Updated notes' })
+    expect(update).toHaveBeenCalledWith({ special_needs: 'Updated notes' })
     fireEvent.click(screen.getByRole('button', { name: 'Close details' }))
     fireEvent.click(screen.getByRole('button', { name: 'Update Test Cat' }))
-    expect(screen.getByLabelText('Foster description')).toHaveValue('Updated notes')
+    expect(screen.getByLabelText('Care observations')).toHaveValue('Updated notes')
   })
 
   it('signs out and returns home', async () => {

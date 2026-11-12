@@ -9,7 +9,7 @@ vi.mock('../lib/supabase', () => ({ supabase: { from: vi.fn() } }))
 const single = vi.fn()
 const select = vi.fn(() => ({ single }))
 const insert = vi.fn(() => ({ select }))
-const newCat = { id: 'synthetic-cat', Name: 'Test Cat', archived_at: null }
+const newCat = { source_record_id: 'synthetic-cat', Name: 'Test Cat', archived_at: null }
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -33,13 +33,14 @@ function save() {
 }
 
 describe('cat creation', () => {
-  it('creates a cat with unknown optional details and a database-generated ID', async () => {
+  it('creates a cat with unknown optional details and a unique cat UUID', async () => {
     const { onCreated } = renderForm()
     enterName()
     save()
     await waitFor(() => expect(onCreated).toHaveBeenCalledWith(newCat))
     expect(insert).toHaveBeenCalledExactlyOnceWith({
-      Name: 'Test Cat', Age_group: null, personality: null,
+      source_record_id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+      Name: 'Test Cat', age_group: null, companionship_style: null,
       special_needs: null, availability_status: null,
     })
     expect(supabase.from).toHaveBeenCalledWith('Cat Profiles')
@@ -55,7 +56,8 @@ describe('cat creation', () => {
     save()
     await waitFor(() => expect(onCreated).toHaveBeenCalled())
     expect(insert).toHaveBeenCalledWith({
-      Name: 'Test Cat', Age_group: 'Adult', personality: 'Quiet',
+      source_record_id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+      Name: 'Test Cat', age_group: 'Adult', companionship_style: 'Quiet',
       special_needs: 'Test care note', availability_status: 'Available',
     })
   })

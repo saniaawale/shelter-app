@@ -14,10 +14,10 @@ const update = vi.fn(() => ({ eq }))
 
 // Synthetic data only; the name is deliberately not used as an identifier.
 const cat = {
-  id: 'test-cat-2',
+  source_record_id: 'test-cat-2',
   Name: 'Test Cat',
-  Age_group: 'Adult',
-  personality: 'Quiet',
+  age_group: 'Adult',
+  companionship_style: 'Quiet',
   special_needs: null,
   availability_status: 'Available',
 }
@@ -92,7 +92,7 @@ describe('cat editing', () => {
     await waitFor(() => expect(onSaved).toHaveBeenCalledWith({ ...cat, availability_status: 'Adopted' }))
     expect(supabase.from).toHaveBeenCalledWith('Cat Profiles')
     expect(update).toHaveBeenCalledExactlyOnceWith({ availability_status: 'Adopted' })
-    expect(eq).toHaveBeenCalledWith('id', 'test-cat-2')
+    expect(eq).toHaveBeenCalledWith('source_record_id', 'test-cat-2')
   })
 
   it('preserves unknown values when an optional field is cleared', async () => {
@@ -101,7 +101,7 @@ describe('cat editing', () => {
     save()
 
     await waitFor(() => expect(onSaved).toHaveBeenCalled())
-    expect(update).toHaveBeenCalledWith({ Age_group: null })
+    expect(update).toHaveBeenCalledWith({ age_group: null })
   })
 
   it('rejects a name containing only whitespace without making a request', () => {

@@ -9,13 +9,13 @@ const single = vi.fn()
 const eq = vi.fn(() => ({ select: vi.fn(() => ({ single })) }))
 const update = vi.fn(() => ({ eq }))
 const cat = {
-  id: 'test-cat', Name: 'Test Cat', personality: 'Quiet', bio: 'Current description',
+  source_record_id: 'test-cat', Name: 'Test Cat', companionship_style: 'Quiet',
   original_foster_description: 'Original description', availability_status: 'Available',
 }
 beforeEach(() => {
   vi.clearAllMocks()
   supabase.from.mockReturnValue({ update })
-  single.mockResolvedValue({ data: { ...cat, personality: 'Playful' }, error: null })
+  single.mockResolvedValue({ data: { ...cat, companionship_style: 'Playful' }, error: null })
 })
 afterEach(cleanup)
 function renderForm() {
@@ -32,7 +32,7 @@ function save() { fireEvent.click(screen.getByRole('button', { name: 'Save detai
 describe('foster cat details', () => {
   it('shows existing details and preserves the original description as read-only', () => {
     renderForm()
-    expect(screen.getByLabelText('Foster description')).toHaveValue('Current description')
+    expect(screen.queryByLabelText('Foster description')).not.toBeInTheDocument()
     expect(screen.getByText('Original description')).toBeInTheDocument()
     expect(screen.getByLabelText('Paired (foster observation)')).toHaveValue('')
   })
@@ -40,15 +40,15 @@ describe('foster cat details', () => {
     const { onSaved } = renderForm()
     change(); save()
     await waitFor(() => expect(onSaved).toHaveBeenCalled())
-    expect(update).toHaveBeenCalledExactlyOnceWith({ personality: 'Playful' })
-    expect(eq).toHaveBeenCalledWith('id', cat.id)
+    expect(update).toHaveBeenCalledExactlyOnceWith({ companionship_style: 'Playful' })
+    expect(eq).toHaveBeenCalledWith('source_record_id', cat.source_record_id)
   })
   it('supports false paired observations without treating unknown as false', async () => {
     const { onSaved } = renderForm()
     fireEvent.change(screen.getByLabelText('Paired (foster observation)'), { target: { value: 'false' } })
     save()
     await waitFor(() => expect(onSaved).toHaveBeenCalled())
-    expect(update).toHaveBeenCalledWith({ Paired: false })
+    expect(update).toHaveBeenCalledWith({ bonded_group_ID: false })
   })
   it('validates whitespace names before requesting updates', () => {
     renderForm()

@@ -65,21 +65,21 @@ export default function FosterDashboard({ onHome }) {
       ) : !linked ? <p>Your foster profile is not linked yet. Ask shelter staff to link your account.</p>
         : cats.length === 0 ? <p>No cats are assigned to you yet. Shelter staff will assign your cats here.</p>
           : <ul className="foster-cat-list">{cats.map(cat => (
-            <li key={cat.id} className="foster-cat-card">
-              <h2>{cat.Name}</h2><p>{cat.Age_group || 'Age unknown'} · {cat.availability_status || 'Availability unknown'}</p>
+            <li key={cat.source_record_id} className="foster-cat-card">
+              <h2>{cat.Name}</h2><p>{cat.age_group || 'Age unknown'} · {cat.availability_status || 'Availability unknown'}</p>
               {cat.archived_at && <p>Archived record</p>}
               <button className="primary-button" type="button" disabled={selected !== null}
                 onClick={() => { setSelected(cat); setNotice('') }}>Update {cat.Name}</button>
             </li>
           ))}</ul>}
       {selected && (
-        <div key={selected.id}>
+        <div key={selected.source_record_id}>
           <FosterCatForm cat={selected} onCancel={() => setSelected(null)} onSaved={saved => {
-            setCats(current => current.map(cat => cat.id === saved.id ? { ...cat, ...saved } : cat))
+            setCats(current => current.map(cat => cat.source_record_id === saved.source_record_id ? { ...cat, ...saved } : cat))
             setSelected(saved)
             setNotice('Cat details saved. You can return and update them anytime.')
           }} />
-          <CatImages catId={selected.id} catName={selected.Name} />
+          <CatImages catId={selected.source_record_id} catName={selected.Name} />
         </div>
       )}
       <button className="outline-button" type="button" disabled={loading || selected !== null}

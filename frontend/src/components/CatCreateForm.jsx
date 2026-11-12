@@ -11,9 +11,10 @@ export default function CatCreateForm({ onCreated, onCancel }) {
 
         const form = new FormData(event.currentTarget)
         const values = {
+        source_record_id: crypto.randomUUID(),
         Name: form.get('name').trim(),
-        Age_group: form.get('age').trim() || null,
-        personality: form.get('personality').trim() || null,
+        age_group: form.get('age').trim() || null,
+        companionship_style: form.get('companionship_style').trim() || null,
         special_needs: form.get('care').trim() || null,
         availability_status: form.get('status').trim() || null,
         }
@@ -31,7 +32,7 @@ export default function CatCreateForm({ onCreated, onCancel }) {
             .from('Cat Profiles')
             .insert(values)
             .select(
-            'id, Name, Age_group, personality, special_needs, availability_status, foster_id, archived_at'
+            'source_record_id, Name, age_group, companionship_style, special_needs, availability_status, foster_id, archived_at'
             )
             .single()
 
@@ -66,7 +67,7 @@ export default function CatCreateForm({ onCreated, onCancel }) {
 
             <label>
                 Personality
-                <textarea name="personality" />
+                <textarea name="companionship_style" />
             </label>
 
             <label>

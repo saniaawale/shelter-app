@@ -45,8 +45,8 @@ export default function CatEditForm({ cat, onSaved, onCancel }) {
 
         const values = {
         Name: form.get('name').trim(),
-        Age_group: form.get('age').trim() || null,
-        personality: form.get('personality').trim() || null,
+        age_group: form.get('age').trim() || null,
+        companionship_style: form.get('companionship_style').trim() || null,
         special_needs: form.get('care').trim() || null,
         availability_status: form.get('status').trim() || null,
         }
@@ -86,9 +86,9 @@ export default function CatEditForm({ cat, onSaved, onCancel }) {
         const { data, error } = await supabase
             .from('Cat Profiles')
             .update(changes)
-            .eq('id', cat.id)
+            .eq('source_record_id', cat.source_record_id)
             .select(
-            'id, Name, Age_group, personality, special_needs, availability_status, foster_id'
+            'source_record_id, Name, age_group, companionship_style, special_needs, availability_status, foster_id'
             )
             .single()
 
@@ -118,14 +118,14 @@ export default function CatEditForm({ cat, onSaved, onCancel }) {
 
             <label>
                 Age group
-                <input name="age" defaultValue={cat.Age_group ?? ''} />
+                <input name="age" defaultValue={cat.age_group ?? ''} />
             </label>
 
             <label>
                 Personality
                 <textarea
-                name="personality"
-                defaultValue={cat.personality ?? ''}
+                name="companionship_style"
+                defaultValue={cat.companionship_style ?? ''}
                 />
             </label>
 

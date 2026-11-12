@@ -26,11 +26,11 @@ afterEach(cleanup)
 
 describe('shelter cat records', () => {
   const currentCat = {
-    id: 'test-cat-current', Name: 'Current Test Cat', availability_status: 'Adopted',
+    source_record_id: 'test-cat-current', Name: 'Current Test Cat', availability_status: 'Adopted',
     foster_id: 'test-foster', archived_at: null,
   }
   const archivedCat = {
-    id: 'test-cat-archived', Name: 'Archived Test Cat', availability_status: 'Available',
+    source_record_id: 'test-cat-archived', Name: 'Archived Test Cat', availability_status: 'Available',
     archived_at: '2026-01-01T00:00:00Z',
   }
 
@@ -54,14 +54,14 @@ describe('shelter cat records', () => {
   it('archives and restores by ID without changing adoption status or foster assignment', async () => {
     await renderRecords()
     const timestamp = '2026-02-01T00:00:00Z'
-    single.mockResolvedValueOnce({ data: { id: currentCat.id, archived_at: timestamp }, error: null })
+    single.mockResolvedValueOnce({ data: { source_record_id: currentCat.source_record_id, archived_at: timestamp }, error: null })
     fireEvent.click(screen.getByRole('button', { name: 'Archive Current Test Cat' }))
     expect(await screen.findByText('Cat archived.')).toBeInTheDocument()
     expect(update).toHaveBeenCalledWith({ archived_at: expect.any(String) })
-    expect(eq).toHaveBeenCalledWith('id', currentCat.id)
+    expect(eq).toHaveBeenCalledWith('source_record_id', currentCat.source_record_id)
     expect(screen.queryByRole('button', { name: 'Archive Current Test Cat' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Show archived records' }))
-    single.mockResolvedValueOnce({ data: { id: currentCat.id, archived_at: null }, error: null })
+    single.mockResolvedValueOnce({ data: { source_record_id: currentCat.source_record_id, archived_at: null }, error: null })
     fireEvent.click(screen.getByRole('button', { name: 'Restore Current Test Cat' }))
     expect(await screen.findByText('Cat restored.')).toBeInTheDocument()
     expect(update).toHaveBeenLastCalledWith({ archived_at: null })
@@ -76,7 +76,7 @@ describe('shelter cat records', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Archive Current Test Cat' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not update the archive state')
     expect(screen.getByRole('button', { name: 'Archive Current Test Cat' })).toBeEnabled()
-    single.mockResolvedValueOnce({ data: { id: currentCat.id, archived_at: '2026-02-01T00:00:00Z' }, error: null })
+    single.mockResolvedValueOnce({ data: { source_record_id: currentCat.source_record_id, archived_at: '2026-02-01T00:00:00Z' }, error: null })
     fireEvent.click(screen.getByRole('button', { name: 'Archive Current Test Cat' }))
     expect(await screen.findByText('Cat archived.')).toBeInTheDocument()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
@@ -92,7 +92,7 @@ describe('shelter cat records', () => {
     expect(screen.getByRole('button', { name: 'Show archived records' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Archive Current Test Cat' }))
     expect(update).toHaveBeenCalledOnce()
-    await act(async () => { finish({ data: { id: currentCat.id, archived_at: '2026-02-01T00:00:00Z' }, error: null }) })
+    await act(async () => { finish({ data: { source_record_id: currentCat.source_record_id, archived_at: '2026-02-01T00:00:00Z' }, error: null }) })
     expect(screen.getByRole('button', { name: 'Add cat' })).toBeEnabled()
   })
 
@@ -102,7 +102,7 @@ describe('shelter cat records', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add cat' }))
     expect(screen.getByRole('button', { name: 'Show current records' })).toBeDisabled()
     fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'New Test Cat' } })
-    single.mockResolvedValueOnce({ data: { id: 'test-new', Name: 'New Test Cat', archived_at: null }, error: null })
+    single.mockResolvedValueOnce({ data: { source_record_id: 'test-new', Name: 'New Test Cat', archived_at: null }, error: null })
     fireEvent.click(screen.getByRole('button', { name: 'Create cat' }))
     expect(await screen.findByText('Cat created.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Archive New Test Cat' })).toBeInTheDocument()
@@ -123,8 +123,8 @@ describe('shelter cat records', () => {
     // Synthetic fixtures, not real shelter records.
     select.mockResolvedValue({
       data: [
-        { id: 'test-cat-1', Name: 'Test Cat', Age_group: 'Young adult', availability_status: 'Available' },
-        { id: 'test-cat-2', Name: 'Test Cat', Age_group: 'Senior', availability_status: 'Pending' },
+        { source_record_id: 'test-cat-1', Name: 'Test Cat', age_group: 'Young adult', availability_status: 'Available' },
+        { source_record_id: 'test-cat-2', Name: 'Test Cat', age_group: 'Senior', availability_status: 'Pending' },
       ],
       error: null,
     })
@@ -137,12 +137,12 @@ describe('shelter cat records', () => {
     expect(items[1]).toHaveTextContent('Test Cat — Senior — Pending')
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
     expect(supabase.from).toHaveBeenCalledWith('Cat Profiles')
-    expect(select).toHaveBeenCalledWith('id, Name, Age_group, personality, special_needs, availability_status, foster_id, archived_at')
+    expect(select).toHaveBeenCalledWith('source_record_id, Name, age_group, companionship_style, special_needs, availability_status, foster_id, archived_at')
   })
 
   it('keeps missing age and availability explicitly unknown', async () => {
     select.mockResolvedValue({
-      data: [{ id: 'test-cat-1', Name: 'Test Cat', Age_group: null, availability_status: null }],
+      data: [{ source_record_id: 'test-cat-1', Name: 'Test Cat', age_group: null, availability_status: null }],
       error: null,
     })
     render(<ShelterDashboard />)
