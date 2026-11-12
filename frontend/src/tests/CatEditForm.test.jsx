@@ -57,6 +57,7 @@ function save() {
 }
 
 describe('cat editing', () => {
+  // Runs assignment, reassignment, and unassignment cases to check only the changed foster ID is saved.
   it.each([
     [null, '11111111-1111-4111-8111-111111111111'],
     ['11111111-1111-4111-8111-111111111111', '22222222-2222-4222-8222-222222222222'],
@@ -75,6 +76,7 @@ describe('cat editing', () => {
     expect(fosterSelect).toHaveBeenCalledWith('foster_id, Name')
   })
 
+  // Checks existing cat details populate the form and unknown care needs display as blank.
   it('populates the existing details and leaves unknown care needs blank', () => {
     renderForm()
     expect(screen.getByLabelText('Name')).toHaveValue('Test Cat')
@@ -84,6 +86,7 @@ describe('cat editing', () => {
     expect(screen.getByLabelText('Adoption status')).toHaveValue('Available')
   })
 
+  // Checks a changed status is trimmed, saved using the cat UUID, and returned through the success callback.
   it('saves only changed fields by stable cat ID and returns the confirmed record', async () => {
     const { onSaved } = renderForm()
     changeStatus('  Adopted  ')
@@ -95,6 +98,7 @@ describe('cat editing', () => {
     expect(eq).toHaveBeenCalledWith('source_record_id', 'test-cat-2')
   })
 
+  // Checks clearing an optional age saves null rather than an empty string.
   it('preserves unknown values when an optional field is cleared', async () => {
     const { onSaved } = renderForm()
     fireEvent.change(screen.getByLabelText('Age group'), { target: { value: ' ' } })
@@ -104,6 +108,7 @@ describe('cat editing', () => {
     expect(update).toHaveBeenCalledWith({ age_group: null })
   })
 
+  // Checks a whitespace-only name prevents updates and does not report a successful save.
   it('rejects a name containing only whitespace without making a request', () => {
     const { onSaved } = renderForm()
     fireEvent.change(screen.getByLabelText('Name'), { target: { value: '   ' } })
@@ -114,6 +119,7 @@ describe('cat editing', () => {
     expect(onSaved).not.toHaveBeenCalled()
   })
 
+  // Checks Cancel discards form changes without a database update.
   it('cancels without saving', () => {
     const { onCancel } = renderForm()
     changeStatus()
@@ -123,6 +129,7 @@ describe('cat editing', () => {
     expect(update).not.toHaveBeenCalled()
   })
 
+  // Checks submitting an unchanged form closes it without sending an update.
   it('closes an unchanged form without writing to the database', () => {
     const { onCancel } = renderForm()
     save()
@@ -130,6 +137,7 @@ describe('cat editing', () => {
     expect(update).not.toHaveBeenCalled()
   })
 
+  // Holds a save pending to check editing and duplicate saves are blocked until the server responds.
   it('disables editing and repeated saves until the server confirms success', async () => {
     let resolveSave
     single.mockReturnValue(new Promise(resolve => { resolveSave = resolve }))
@@ -151,6 +159,7 @@ describe('cat editing', () => {
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled()
   })
 
+  // Runs database-error, network-error, and missing-record cases to check entered changes survive and retry succeeds.
   it.each(['database', 'network', 'missing record'])(
     'preserves input and allows retry after a %s failure', async failure => {
       if (failure === 'network') {

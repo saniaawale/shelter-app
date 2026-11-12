@@ -40,6 +40,7 @@ describe('shelter cat records', () => {
     await screen.findByRole('button', { name: 'Archive Current Test Cat' })
   }
 
+  // Checks current cats remain visible regardless of adoption status and the archived view shows archived cats separately.
   it('shows unavailable current cats and provides access to archived cats separately', async () => {
     await renderRecords()
     expect(screen.getByRole('listitem')).toHaveTextContent('Current Test Cat — Age unknown — Adopted')
@@ -51,6 +52,7 @@ describe('shelter cat records', () => {
     expect(screen.queryByRole('button', { name: 'Archive Current Test Cat' })).not.toBeInTheDocument()
   })
 
+  // Checks archive/restore updates only archived_at using the cat UUID, preserving adoption status.
   it('archives and restores by ID without changing adoption status or foster assignment', async () => {
     await renderRecords()
     const timestamp = '2026-02-01T00:00:00Z'
@@ -69,6 +71,7 @@ describe('shelter cat records', () => {
     expect(screen.getByRole('listitem')).toHaveTextContent('Adopted')
   })
 
+  // Runs database-error, network-error, and missing-record cases to check archive failure retains the cat and retry succeeds.
   it.each(['database', 'network', 'missing record'])('preserves records and permits retry after archive %s failure', async type => {
     await renderRecords()
     if (type === 'network') single.mockRejectedValueOnce(new Error('Offline'))
@@ -82,6 +85,7 @@ describe('shelter cat records', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
+  // Holds archiving pending to check create/edit/view controls are disabled and duplicate archive clicks are ignored.
   it('blocks overlapping actions while archiving', async () => {
     await renderRecords()
     let finish
@@ -96,6 +100,7 @@ describe('shelter cat records', () => {
     expect(screen.getByRole('button', { name: 'Add cat' })).toBeEnabled()
   })
 
+  // Checks successful cat creation closes the form, adds the returned cat, and switches back to the current-record view.
   it('opens creation and adds the confirmed cat to the current list', async () => {
     await renderRecords()
     fireEvent.click(screen.getByRole('button', { name: 'Show archived records' }))
@@ -110,6 +115,7 @@ describe('shelter cat records', () => {
     expect(screen.queryByLabelText('Name')).not.toBeInTheDocument()
   })
 
+  // Checks a pending load shows a loading message rather than a list or an empty-result message.
   it('shows loading while the request is pending', () => {
     select.mockReturnValue(new Promise(() => {}))
     render(<ShelterDashboard />)
@@ -119,6 +125,7 @@ describe('shelter cat records', () => {
     expect(screen.queryByText('No current cat records are available to your account.')).not.toBeInTheDocument()
   })
 
+  // Checks cats sharing a name render as separate records and the query selects the current database columns.
   it('displays returned records, including cats that share a name', async () => {
     // Synthetic fixtures, not real shelter records.
     select.mockResolvedValue({
@@ -140,6 +147,7 @@ describe('shelter cat records', () => {
     expect(select).toHaveBeenCalledWith('source_record_id, Name, age_group, companionship_style, special_needs, availability_status, foster_id, archived_at')
   })
 
+  // Checks missing age and availability display explicit unknown labels.
   it('keeps missing age and availability explicitly unknown', async () => {
     select.mockResolvedValue({
       data: [{ source_record_id: 'test-cat-1', Name: 'Test Cat', age_group: null, availability_status: null }],
@@ -152,6 +160,7 @@ describe('shelter cat records', () => {
     )
   })
 
+  // Runs empty-array and null-data responses to check a successful empty result has no list, error, or loading indicator.
   it.each([[], null])('shows an empty state for a successful response with data %j', async data => {
     select.mockResolvedValue({ data, error: null })
     render(<ShelterDashboard />)
@@ -162,6 +171,7 @@ describe('shelter cat records', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
+  // Checks a database error shows a safe message without revealing internal details or claiming the list is empty.
   it('shows a safe error rather than an empty state for a database failure', async () => {
     select.mockResolvedValue({ data: null, error: { message: 'Internal database details' } })
     render(<ShelterDashboard />)
@@ -172,6 +182,7 @@ describe('shelter cat records', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
+  // Checks a rejected network request shows a load error and clears the loading indicator.
   it('handles a rejected network request', async () => {
     select.mockRejectedValue(new Error('Offline'))
     render(<ShelterDashboard />)

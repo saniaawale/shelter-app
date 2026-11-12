@@ -33,6 +33,7 @@ function save() {
 }
 
 describe('cat creation', () => {
+  // Checks creation sends a unique UUID and name, leaves optional details null, and returns the saved record.
   it('creates a cat with unknown optional details and a unique cat UUID', async () => {
     const { onCreated } = renderForm()
     enterName()
@@ -46,6 +47,7 @@ describe('cat creation', () => {
     expect(supabase.from).toHaveBeenCalledWith('Cat Profiles')
   })
 
+  // Checks entered details are trimmed and saved without assigning a foster or setting an archive date.
   it('includes entered details without creating an assignment or an archive timestamp', async () => {
     const { onCreated } = renderForm()
     enterName()
@@ -62,6 +64,7 @@ describe('cat creation', () => {
     })
   })
 
+  // Checks a whitespace-only name shows validation feedback without sending an insert request.
   it('rejects whitespace-only names before sending a request', () => {
     renderForm()
     enterName('   ')
@@ -70,6 +73,7 @@ describe('cat creation', () => {
     expect(insert).not.toHaveBeenCalled()
   })
 
+  // Checks the browser marks an empty required name invalid and prevents a database write.
   it('lets browser validation reject an empty name', () => {
     renderForm()
     save()
@@ -77,6 +81,7 @@ describe('cat creation', () => {
     expect(insert).not.toHaveBeenCalled()
   })
 
+  // Checks Cancel closes the form without inserting a cat.
   it('cancels without creating a record', () => {
     const { onCancel } = renderForm()
     enterName()
@@ -85,6 +90,7 @@ describe('cat creation', () => {
     expect(insert).not.toHaveBeenCalled()
   })
 
+  // Holds creation pending to check inputs are disabled and repeated clicks send only one request.
   it('disables duplicate submissions while awaiting confirmation', async () => {
     let finish
     single.mockReturnValueOnce(new Promise(resolve => { finish = resolve }))
@@ -101,6 +107,7 @@ describe('cat creation', () => {
     expect(onCreated).toHaveBeenCalledOnce()
   })
 
+  // Runs database-error, network-error, and missing-record cases to check input survives and a second save succeeds.
   it.each(['database', 'network', 'missing record'])('preserves input and permits retry after %s failure', async type => {
     if (type === 'network') single.mockRejectedValueOnce(new Error('Offline'))
     else single.mockResolvedValueOnce({ data: null, error: type === 'database' ? { message: 'Private details' } : null })

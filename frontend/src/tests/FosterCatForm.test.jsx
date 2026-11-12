@@ -30,12 +30,14 @@ function change() {
 function save() { fireEvent.click(screen.getByRole('button', { name: 'Save details' })) }
 
 describe('foster cat details', () => {
+  // Checks the original description is displayed read-only, with no editable description field and unknown pairing left blank.
   it('shows existing details and preserves the original description as read-only', () => {
     renderForm()
     expect(screen.queryByLabelText('Foster description')).not.toBeInTheDocument()
     expect(screen.getByText('Original description')).toBeInTheDocument()
     expect(screen.getByLabelText('Paired (foster observation)')).toHaveValue('')
   })
+  // Checks only the changed personality field is sent, using the cat UUID as the update filter.
   it('saves only changed fields by stable cat ID', async () => {
     const { onSaved } = renderForm()
     change(); save()
@@ -43,6 +45,7 @@ describe('foster cat details', () => {
     expect(update).toHaveBeenCalledExactlyOnceWith({ companionship_style: 'Playful' })
     expect(eq).toHaveBeenCalledWith('source_record_id', cat.source_record_id)
   })
+  // Checks choosing No saves boolean false rather than confusing it with unknown/null.
   it('supports false paired observations without treating unknown as false', async () => {
     const { onSaved } = renderForm()
     fireEvent.change(screen.getByLabelText('Paired (foster observation)'), { target: { value: 'false' } })
@@ -50,6 +53,7 @@ describe('foster cat details', () => {
     await waitFor(() => expect(onSaved).toHaveBeenCalled())
     expect(update).toHaveBeenCalledWith({ bonded_group_ID: false })
   })
+  // Checks a whitespace-only cat name shows an error before an update is requested.
   it('validates whitespace names before requesting updates', () => {
     renderForm()
     fireEvent.change(screen.getByLabelText('Name'), { target: { value: '  ' } })
@@ -57,12 +61,14 @@ describe('foster cat details', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Enter a cat name')
     expect(update).not.toHaveBeenCalled()
   })
+  // Checks saving unchanged details closes the form without a database write.
   it('does not write unchanged details', () => {
     const { onCancel } = renderForm()
     save()
     expect(onCancel).toHaveBeenCalledOnce()
     expect(update).not.toHaveBeenCalled()
   })
+  // Runs denied, missing-record, and network failures to check input survives and the foster can retry saving.
   it.each(['denied', 'missing', 'network'])('preserves input after %s failure and permits retry', async type => {
     if (type === 'network') single.mockRejectedValueOnce(new Error('Offline'))
     else single.mockResolvedValueOnce({ data: null, error: type === 'denied' ? { message: 'Access denied' } : null })
@@ -74,6 +80,7 @@ describe('foster cat details', () => {
     save()
     await waitFor(() => expect(onSaved).toHaveBeenCalled())
   })
+  // Holds a save pending to check the form is disabled and duplicate save clicks are ignored.
   it('disables repeated saves until confirmation', async () => {
     let finish
     single.mockReturnValueOnce(new Promise(resolve => { finish = resolve }))

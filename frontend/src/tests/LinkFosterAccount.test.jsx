@@ -17,6 +17,7 @@ function renderForm() {
   fireEvent.change(screen.getByLabelText('Foster account email'), { target: { value: 'test@example.com' } })
 }
 describe('staff foster account linking', () => {
+  // Checks linking calls the expected RPC with trimmed profile details, reports success, and clears the email field.
   it('links an existing account through the guarded RPC without sending an invitation', async () => {
     renderForm()
     fireEvent.click(screen.getByRole('button', { name: 'Link account' }))
@@ -26,6 +27,7 @@ describe('staff foster account linking', () => {
     })
     expect(screen.getByLabelText('Foster account email')).toHaveValue('')
   })
+  // Checks a rejected linking request explains eligibility, retains the entered email, and enables retry.
   it('preserves entries if the account cannot be linked', async () => {
     supabase.rpc.mockResolvedValueOnce({ data: null, error: { message: 'Not eligible' } })
     renderForm()

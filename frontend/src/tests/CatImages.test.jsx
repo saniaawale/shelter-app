@@ -29,6 +29,7 @@ function choose(file = new File(['synthetic image'], 'test.png', { type: 'image/
 function submit() { fireEvent.click(screen.getByRole('button', { name: 'Upload image' })) }
 
 describe('private cat images', () => {
+  // Checks the gallery lists the selected cat folder in the cat-images bucket and explains when it is empty.
   it('loads only the selected cat folder and shows an empty state', async () => {
     renderImages()
     expect(await screen.findByText('No images added yet.')).toBeInTheDocument()
@@ -36,6 +37,7 @@ describe('private cat images', () => {
     expect(list).toHaveBeenCalledWith('test-cat', expect.objectContaining({ limit: 100, offset: 0 }))
   })
 
+  // Checks a private image is downloaded for preview and its temporary browser URL is released on unmount.
   it('downloads private previews and releases object URLs when unmounted', async () => {
     list.mockResolvedValueOnce({ data: [{ id: 'test-photo', name: 'photo.png' }], error: null })
     const { unmount } = renderImages()
@@ -45,6 +47,7 @@ describe('private cat images', () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:test-photo')
   })
 
+  // Returns a full first page to check the gallery requests the next page instead of stopping at 100 files.
   it('loads additional pages instead of silently truncating the gallery', async () => {
     list.mockResolvedValueOnce({ data: Array.from({ length: 100 }, (_, index) => ({ id: `photo-${index}`, name: `${index}.png` })), error: null })
     renderImages()
@@ -52,6 +55,7 @@ describe('private cat images', () => {
     expect(list).toHaveBeenNthCalledWith(2, 'test-cat', expect.objectContaining({ offset: 100 }))
   })
 
+  // Checks upload uses a generated filename inside the cat folder, avoids overwrites, and reloads the gallery.
   it('uploads under a generated cat-specific path and refreshes previews', async () => {
     renderImages()
     await screen.findByText('No images added yet.')
@@ -64,6 +68,7 @@ describe('private cat images', () => {
     expect(screen.getByRole('button', { name: 'Upload image' })).toBeDisabled()
   })
 
+  // Runs SVG and plain-text file cases to check unsupported types are rejected before any upload request.
   it.each(['image/svg+xml', 'text/plain'])('rejects unsupported %s files before contacting Storage', async type => {
     renderImages()
     await screen.findByText('No images added yet.')
@@ -72,6 +77,7 @@ describe('private cat images', () => {
     expect(upload).not.toHaveBeenCalled()
   })
 
+  // Checks a file larger than 10 MB shows a size error and is not uploaded.
   it('rejects oversized images', async () => {
     renderImages()
     await screen.findByText('No images added yet.')
@@ -82,6 +88,7 @@ describe('private cat images', () => {
     expect(upload).not.toHaveBeenCalled()
   })
 
+  // Checks a denied upload keeps the selected file and a second attempt can succeed.
   it('preserves file selection after denied upload and allows retry', async () => {
     upload.mockResolvedValueOnce({ data: null, error: { message: 'Denied' } })
     renderImages()
@@ -94,6 +101,7 @@ describe('private cat images', () => {
     expect(upload).toHaveBeenCalledTimes(2)
   })
 
+  // Holds an upload pending to check repeated clicks cannot send duplicate upload requests.
   it('blocks duplicate uploads while a request is pending', async () => {
     let finish
     upload.mockReturnValueOnce(new Promise(resolve => { finish = resolve }))
@@ -108,6 +116,7 @@ describe('private cat images', () => {
     expect(screen.getByText(/Image uploaded/)).toBeInTheDocument()
   })
 
+  // Checks a failed image-list request can be retried while the file picker remains usable.
   it('recovers from a gallery failure without disabling uploads', async () => {
     list.mockRejectedValueOnce(new Error('Offline'))
     renderImages()

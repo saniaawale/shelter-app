@@ -38,6 +38,7 @@ function renderDashboard() {
 }
 
 describe('foster dashboard', () => {
+  // Checks the profile query uses the authenticated user ID and the cat query filters by that profile's foster ID.
   it('loads the authenticated profile and queries only its assigned cats', async () => {
     renderDashboard()
     expect(await screen.findByRole('button', { name: 'Update Test Cat' })).toBeInTheDocument()
@@ -45,12 +46,14 @@ describe('foster dashboard', () => {
     expect(catQuery).toHaveBeenCalledWith('foster_id', profile.foster_id)
   })
 
+  // Checks a pending profile request displays the loading state.
   it('waits for the initial request', () => {
     maybeSingle.mockReturnValueOnce(new Promise(() => {}))
     renderDashboard()
     expect(screen.getByRole('status')).toHaveTextContent('Loading your cats')
   })
 
+  // Checks an unlinked account sees setup guidance and no assigned-cat query is sent.
   it('explains when the account has not been linked', async () => {
     maybeSingle.mockResolvedValueOnce({ data: null, error: null })
     renderDashboard()
@@ -58,12 +61,14 @@ describe('foster dashboard', () => {
     expect(catQuery).not.toHaveBeenCalled()
   })
 
+  // Checks a linked foster with no cats sees the assigned-cats empty state.
   it('shows an empty state for a linked foster without cats', async () => {
     catQuery.mockResolvedValueOnce({ data: [], error: null })
     renderDashboard()
     expect(await screen.findByText(/No cats are assigned to you yet/)).toBeInTheDocument()
   })
 
+  // Checks a failed assigned-cat request shows an error and Retry loads the cats successfully.
   it('recovers from a loading failure on retry', async () => {
     catQuery.mockRejectedValueOnce(new Error('Offline'))
     renderDashboard()
@@ -72,6 +77,7 @@ describe('foster dashboard', () => {
     expect(await screen.findByRole('button', { name: 'Update Test Cat' })).toBeInTheDocument()
   })
 
+  // Checks opening a cat shows saved care notes and photos without status/assignment controls, and closes cleanly.
   it('opens saved details and photos without exposing status or assignment controls', async () => {
     renderDashboard()
     fireEvent.click(await screen.findByRole('button', { name: 'Update Test Cat' }))
@@ -84,6 +90,7 @@ describe('foster dashboard', () => {
     expect(screen.queryByLabelText('Care observations')).not.toBeInTheDocument()
   })
 
+  // Checks successful care-note changes are retained in the dashboard when the cat form is reopened.
   it('keeps saved changes when details are reopened', async () => {
     renderDashboard()
     fireEvent.click(await screen.findByRole('button', { name: 'Update Test Cat' }))
@@ -96,6 +103,7 @@ describe('foster dashboard', () => {
     expect(screen.getByLabelText('Care observations')).toHaveValue('Updated notes')
   })
 
+  // Checks Sign out calls the authentication action and returns to the home page.
   it('signs out and returns home', async () => {
     const { onHome } = renderDashboard()
     fireEvent.click(screen.getByRole('button', { name: 'Sign out' }))

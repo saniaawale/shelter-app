@@ -31,17 +31,20 @@ function renderPage(path, auth) {
 }
 
 describe('protected pages', () => {
+  // Checks the account-loading message appears while authentication is unresolved.
   it('waits for authentication before showing a dashboard', () => {
     renderPage('/shelter-dashboard', { loading: true })
     expect(screen.getByRole('status')).toHaveTextContent('Checking your account')
     expect(screen.queryByText('Your shelter tools will appear here.')).not.toBeInTheDocument()
   })
 
+  // Checks a signed-out visitor sees the login form when opening a protected dashboard.
   it('shows login to a signed-out visitor', () => {
     renderPage('/foster-dashboard', {})
     expect(screen.getByRole('heading', { name: 'Login form' })).toBeInTheDocument()
   })
 
+  // Runs for foster and shelter roles to check each can open its own dashboard.
   it.each([
     ['foster', '/foster-dashboard', 'Foster dashboard'],
     ['shelter', '/shelter-dashboard', 'Shelter dashboard'],
@@ -50,17 +53,20 @@ describe('protected pages', () => {
     expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument()
   })
 
+  // Checks an adopter opening the shelter URL directly receives an access error.
   it('blocks an adopter from a shelter dashboard opened directly', () => {
     renderPage('/shelter-dashboard', { user: { id: 'test-user' }, role: 'adopter' })
     expect(screen.getByRole('alert')).toHaveTextContent('does not have access')
     expect(screen.queryByText('Your shelter tools will appear here.')).not.toBeInTheDocument()
   })
 
+  // Checks a foster account cannot open the adopter quiz.
   it('blocks fosters from the adopter quiz', () => {
     renderPage('/quiz', { user: { id: 'test-user' }, role: 'foster' })
     expect(screen.getByRole('alert')).toHaveTextContent('does not have access')
   })
 
+  // Checks a role lookup failure is shown instead of granting access to protected content.
   it('shows role-loading errors instead of protected content', () => {
     renderPage('/shelter-dashboard', { user: { id: 'test-user' }, error: 'Could not load role.' })
     expect(screen.getByRole('alert')).toHaveTextContent('Could not load role.')

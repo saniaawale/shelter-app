@@ -49,6 +49,7 @@ function submit(name) {
 }
 
 describe('adopter signup', () => {
+  // Checks mismatched signup passwords show validation feedback without calling signup or navigating.
   it('rejects mismatched passwords before contacting Supabase', () => {
     const navigate = vi.fn()
     render(<LoginSignup page="signup" navigate={navigate} />)
@@ -63,6 +64,7 @@ describe('adopter signup', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
+  // Checks signup with an active session navigates to the adopter quiz.
   it('opens the quiz when signup returns a session', async () => {
     supabase.auth.signUp.mockResolvedValue({ data: { session: {} }, error: null })
     const navigate = vi.fn()
@@ -73,6 +75,7 @@ describe('adopter signup', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('quiz'))
   })
 
+  // Checks signup without a session asks for email confirmation and does not navigate.
   it('asks for email confirmation instead of navigating without a session', async () => {
     supabase.auth.signUp.mockResolvedValue({ data: { session: null }, error: null })
     const navigate = vi.fn()
@@ -86,6 +89,7 @@ describe('adopter signup', () => {
 })
 
 describe('account login', () => {
+  // Runs adopter, foster, and shelter cases to check login loads the role by user ID and chooses its destination.
   it.each([
     ['adopter', 'quiz'],
     ['foster', 'foster-dashboard'],
@@ -101,6 +105,7 @@ describe('account login', () => {
     expect(eq).toHaveBeenCalledWith('user_id', 'test-user-id')
   })
 
+  // Checks invalid credentials retain the email and prevent role queries and navigation.
   it('shows authentication errors and preserves the entered email', async () => {
     supabase.auth.signInWithPassword.mockResolvedValue({
       data: null, error: { message: 'Invalid login credentials' },
@@ -116,6 +121,7 @@ describe('account login', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
+  // Checks a failed role lookup shows retry guidance and does not navigate.
   it('does not navigate when loading the role fails', async () => {
     single.mockResolvedValue({ data: null, error: { message: 'Role unavailable' } })
     const navigate = vi.fn()
@@ -127,6 +133,7 @@ describe('account login', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
+  // Checks an unrecognized role shows account-setup guidance rather than choosing a protected destination.
   it('does not grant a destination to an unknown role', async () => {
     single.mockResolvedValue({ data: { role: 'unknown' }, error: null })
     const navigate = vi.fn()
@@ -138,6 +145,7 @@ describe('account login', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
+  // Checks a rejected login request shows a connection error and does not navigate.
   it('shows a recoverable error when the connection fails', async () => {
     supabase.auth.signInWithPassword.mockRejectedValue(new Error('Offline'))
     const navigate = vi.fn()
