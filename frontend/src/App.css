@@ -268,14 +268,6 @@
 .quiz-review dd { margin: 10px 0 0; line-height: 1.6; }
 .quiz-content .form-notice { margin-bottom: 22px; font-size: 14px; }
 
-.match-group { margin: 32px 0; }
-.match-list { display: grid; gap: 18px; padding-left: 24px; }
-.match-card { padding: 22px; border: 1px solid var(--line); border-radius: 18px; overflow-wrap: anywhere; }
-.match-card h3 { margin: 0 0 12px; }
-.match-card li { margin: 8px 0; line-height: 1.6; }
-.match-considerations { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 12px; }
-.match-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
-
 button:focus-visible,
 a:focus-visible { outline: 3px solid var(--berry); outline-offset: 3px; }
 

@@ -14,8 +14,8 @@ const questions = [
   { id: 'count', text: 'How many cats are you looking to adopt?', options: ['1', '2+'] },
 ]
 
-export default function AdopterQuiz({ onHome, onViewMatches, initialAnswers }) {
-  const [answers, setAnswers] = useState(() => initialAnswers || loadQuizAnswers())
+export default function AdopterQuiz({ onHome, onViewMatches }) {
+  const [answers, setAnswers] = useState(loadQuizAnswers) // Restore the tabs previous answers when the quiz opens.
 
   //preserve changes so navigating away from the quiz and back doesn't lose answers
   useEffect(() => { saveQuizAnswers(answers)}, [answers])
@@ -47,7 +47,7 @@ export default function AdopterQuiz({ onHome, onViewMatches, initialAnswers }) {
   return (
   <QuizPage
     onHome={onHome}
-    onViewMatches={onViewMatches ? () => onViewMatches(answers) : undefined}
+    onViewMatches={onViewMatches}
     questions={questions}
     answers={answers}
     reviewing={reviewing}

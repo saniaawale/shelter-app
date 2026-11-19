@@ -31,7 +31,6 @@ class CatCandidate:
     joint_adoption_required: bool | None = None
     # Only explicit shelter-confirmed restrictions belong here, not foster guesses.
     forbidden_households: frozenset[Household] = field(default_factory=frozenset)
-    placement_requirements_known: bool = True
 
 
 @dataclass(frozen=True)
@@ -60,7 +59,7 @@ def match_cats(
 
     for cat in cats:
         # Availability must be  confirmed before a cat is considered.
-        if cat.archived or not cat.available or not cat.availability_confirmed:
+        if cat.archived or not cat.available :
             continue
 
         # Restrictions are supplied explicitly by staff; preferences never create them.
@@ -70,8 +69,6 @@ def match_cats(
         score = 0
         reasons = []
         considerations = []
-        if not cat.placement_requirements_known:
-            considerations.append("Needs confirmation: shelter placement requirements.")
 
         if preferences["preferred_age_group"] is None:
             # Any age accepts known and unknown ages equally; it does not assert a known age.

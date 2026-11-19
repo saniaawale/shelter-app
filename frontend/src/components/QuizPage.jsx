@@ -18,7 +18,7 @@ export default function QuizPage({ onHome, onViewMatches, questions, answers, re
               <dd>{Array.isArray(answers[question.id]) ? answers[question.id].join(', ') || 'None selected' : answers[question.id]}</dd>
             </div>)}
           </dl>
-          <p className="form-notice" role="status">No account is required. Your browser will try to keep your answers for this tab. Choose View matches to send your answers for matching; this does not submit an adoption application.</p>
+          <p className="form-notice" role="status"> No account is required to take the quiz. Your browser will try to keep your answers for this tab. Your answers have not been sent to the shelter. Cat matching is not available yet. </p>
           <button className="primary-button" type="button" onClick={() => setReviewing(false)}>Edit answers</button>
           {onViewMatches && <button className="outline-button" type="button" onClick={onViewMatches}>View matches</button>}
         </> : <form onSubmit={review}>
