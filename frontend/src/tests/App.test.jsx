@@ -19,11 +19,16 @@ vi.mock('../components/LoginSignup', () => ({
 beforeEach(() => {
   sessionStorage.clear()
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({
+    matches: [{ source_record_id: 'synthetic-cat', name: 'Test Quiz Result', score: 5, reasons: ['Matches your preferences.'], considerations: [] }],
+    needs_confirmation: [],
+  }) }))
 })
 
 afterEach(() => {
   cleanup()
   vi.restoreAllMocks()
+  vi.unstubAllGlobals()
   window.history.replaceState({}, '', '/')
 })
 
@@ -81,8 +86,13 @@ describe('protected pages', () => {
 })
 
 describe('public adopter pages and private bookmarks', () => {
-  // Checks guest answers survive quiz-to-matches navigation and the Retake quiz action.
-  it('restores quiz answers after matches and Retake quiz', () => {
+  // Checks quiz completion displays API results and preserves answers even when browser storage is blocked.
+  it.each([false, true])('shows results and restores answers with storage blocked=%s', async blocked => {
+    // Simulate either normal browser storage or a browser rejecting storage access.
+    if (blocked) {
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('Storage blocked') })
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Storage blocked') })
+    }
     renderPage('/quiz', {})
     fireEvent.change(screen.getByLabelText('When would you be ready to adopt?'), { target: { value: 'Next month' } })
     fireEvent.change(screen.getByLabelText('What kind of environment is your household like?'), { target: { value: 'Quiet' } })
@@ -93,12 +103,22 @@ describe('public adopter pages and private bookmarks', () => {
     fireEvent.click(screen.getByRole('button', { name: 'View matches' }))
     expect(window.location.pathname).toBe('/matches')
     expect(screen.getByRole('heading', { name: 'Your cat matches' })).toBeInTheDocument()
+    // Real app navigation must send current answers and show the mocked API response without login.
+    expect(await screen.findByRole('heading', { name: 'Test Quiz Result' })).toBeInTheDocument()
+    expect(JSON.parse(fetch.mock.calls[0][1].body).environment).toBe('Quiet')
     fireEvent.click(screen.getByRole('button', { name: 'Retake quiz' }))
     expect(window.location.pathname).toBe('/quiz')
     expect(screen.getByLabelText('When would you be ready to adopt?')).toHaveValue('Next month')
     expect(screen.getByLabelText('What kind of environment is your household like?')).toHaveValue('Quiet')
     expect(screen.getByLabelText('Cat(s)', { exact: true })).toBeChecked()
     expect(screen.getByLabelText('Lap cat', { exact: true })).toBeChecked()
+    // Retaking must submit the edited preferences, rather than reuse the previous request.
+    fireEvent.click(screen.getByLabelText('Senior (9+ years)', { exact: true }))
+    fireEvent.click(screen.getByRole('button', { name: /Review my answers/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'View matches' }))
+    expect(await screen.findByRole('heading', { name: 'Test Quiz Result' })).toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(JSON.parse(fetch.mock.calls[1][1].body).age).toBe('Senior (9+ years)')
   })
   // Checks guests can open both quiz and matches without waiting for authentication.
   it.each([
