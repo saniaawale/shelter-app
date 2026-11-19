@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import QuizPage from '../components/QuizPage'
+import {loadQuizAnswers, saveQuizAnswers} from '../lib/guestQuiz'
 
 
 const questions = [
@@ -13,8 +14,12 @@ const questions = [
   { id: 'count', text: 'How many cats are you looking to adopt?', options: ['1', '2+'] },
 ]
 
-export default function AdopterQuiz({ onHome }) {
-  const [answers, setAnswers] = useState({ household: [], temperaments: [] })
+export default function AdopterQuiz({ onHome, onViewMatches }) {
+  const [answers, setAnswers] = useState(loadQuizAnswers) // Restore the tabs previous answers when the quiz opens.
+
+  //preserve changes so navigating away from the quiz and back doesn't lose answers
+  useEffect(() => { saveQuizAnswers(answers)}, [answers])
+  //const [answers, setAnswers] = useState({ household: [], temperaments: [] })
   const [reviewing, setReviewing] = useState(false)
   const [error, setError] = useState('')
 
@@ -42,6 +47,7 @@ export default function AdopterQuiz({ onHome }) {
   return (
   <QuizPage
     onHome={onHome}
+    onViewMatches={onViewMatches}
     questions={questions}
     answers={answers}
     reviewing={reviewing}

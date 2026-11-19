@@ -19,7 +19,7 @@ export default function Home({ navigate, lightCloud,SleepingCat, darkCloud}) {
         <div className="hero-copy">
           <h1>A softer way to find your <em>best friend.</em></h1>
           <div className="hero-actions">
-            <button className="primary-button" onClick={() => navigate('signup')}>Find your match <span aria-hidden="true">→</span></button>
+            <button className="primary-button" onClick={() => navigate('quiz')}>Find your match <span aria-hidden="true">→</span></button>
             <button className="text-button" onClick={() => navigate('login')}>I’m a foster parent</button>
           </div>
         </div>
@@ -40,7 +40,7 @@ export default function Home({ navigate, lightCloud,SleepingCat, darkCloud}) {
       <section className="promise-section" id="our-promise">
         <div className="promise-mark"><PawMark /></div>
         <div><span className="eyebrow">Made for the in-between moments</span><h2>Here for the whole journey.</h2><p>From first browse to the first night at home, we are beside you and your new companion every step of the way.</p></div>
-        <button className="outline-button" onClick={() => navigate('signup')}>Get started</button>
+        <button className="outline-button" onClick={() => navigate('quiz')}>Get started</button>
       </section>
       <footer className="site-footer"><button className="wordmark footer-wordmark" type="button" onClick={() => navigate('home')}><PawMark /><span>cat<b>matchmaker</b></span></button><span></span><button className="footer-login" type="button" onClick={() => navigate('login')}>Shelter & foster sign in</button></footer>
     </main>

@@ -41,7 +41,7 @@ describe('private cat images', () => {
   it('downloads private previews and releases object URLs when unmounted', async () => {
     list.mockResolvedValueOnce({ data: [{ id: 'test-photo', name: 'photo.png' }], error: null })
     const { unmount } = renderImages()
-    expect(await screen.findByAltText('Test Cat, photo 1')).toHaveAttribute('src', 'blob:test-photo')
+    expect(await screen.findByRole('img', { name: 'Test Cat, photo 1' })).toHaveAttribute('src', 'blob:test-photo')
     expect(download).toHaveBeenCalledWith('test-cat/photo.png')
     unmount()
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:test-photo')
@@ -51,7 +51,7 @@ describe('private cat images', () => {
   it('loads additional pages instead of silently truncating the gallery', async () => {
     list.mockResolvedValueOnce({ data: Array.from({ length: 100 }, (_, index) => ({ id: `photo-${index}`, name: `${index}.png` })), error: null })
     renderImages()
-    await waitFor(() => expect(screen.getAllByRole('img')).toHaveLength(100))
+    await waitFor(() => expect(screen.getAllByRole('img', { name: /^Test Cat, photo \d+$/ })).toHaveLength(100))
     expect(list).toHaveBeenNthCalledWith(2, 'test-cat', expect.objectContaining({ offset: 100 }))
   })
 

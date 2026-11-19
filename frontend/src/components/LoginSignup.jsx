@@ -34,7 +34,7 @@ export default function LoginSignup({ page, navigate }) {
             }
 
             if (data.session) {
-                navigate('quiz')
+                navigate('adopter-dashboard')
             } else {
                 setNotice('Check your email to confirm your account, then sign in.')
             }
@@ -61,7 +61,7 @@ export default function LoginSignup({ page, navigate }) {
                 }
                 switch (roleRecord.role) {
                     case 'adopter':
-                        navigate('quiz')
+                        navigate('adopter-dashboard')
                     break
                     case 'foster':
                         navigate('foster-dashboard')

@@ -64,15 +64,15 @@ describe('adopter signup', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
-  // Checks signup with an active session navigates to the adopter quiz.
-  it('opens the quiz when signup returns a session', async () => {
+  // Checks signup with an active session navigates to the bookmarks dashboard.
+  it('opens the bookmarks dashboard when signup returns a session', async () => {
     supabase.auth.signUp.mockResolvedValue({ data: { session: {} }, error: null })
     const navigate = vi.fn()
     render(<LoginSignup page="signup" navigate={navigate} />)
     fillForm(true)
     submit(/Create account/)
 
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith('quiz'))
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('adopter-dashboard'))
   })
 
   // Checks signup without a session asks for email confirmation and does not navigate.
@@ -91,7 +91,7 @@ describe('adopter signup', () => {
 describe('account login', () => {
   // Runs adopter, foster, and shelter cases to check login loads the role by user ID and chooses its destination.
   it.each([
-    ['adopter', 'quiz'],
+    ['adopter', 'adopter-dashboard'],
     ['foster', 'foster-dashboard'],
     ['shelter', 'shelter-dashboard'],
   ])('routes a %s account to %s', async (role, destination) => {

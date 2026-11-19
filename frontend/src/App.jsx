@@ -9,9 +9,12 @@ import LoginSignup from './components/LoginSignup'
 import { AuthContext } from './context/authcontext.js'
 import ShelterDashboard from './pages/ShelterDashboard.jsx'
 import FosterDashboard from './pages/FosterDashboard.jsx'
+import AdopterDashboard from './pages/AdopterDashboard'
+import CatDetails from './pages/CatDetails'
+import Matches from './pages/Matches'
 
 const requiredRoles = {
-  quiz: 'adopter',
+  'adopter-dashboard': 'adopter',
   'foster-dashboard': 'foster',
   'shelter-dashboard': 'shelter',
 }
@@ -85,8 +88,29 @@ function App() {
   }
 
   if (page === 'quiz') {
-    return <AdopterQuiz onHome={() => navigate('home')} />
+    return <AdopterQuiz onHome={() => navigate('home')} onViewMatches={() => navigate('matches')} />
   }
+
+  if (page === 'matches') {
+    return <Matches navigate={navigate} />
+  }
+
+  if (page === 'adopter-dashboard') {
+    return <AdopterDashboard key={user.id} navigate={navigate} />
+  }
+
+  const catRoute = /^cats\/([^/]+)\/?$/.exec(page)
+
+  if (catRoute) {
+    return (
+      <CatDetails
+        key={catRoute[1]}
+        catId={catRoute[1]}
+        navigate={navigate}
+      />
+    )
+  }
+
 
   if (page === 'login' || page === 'signup') {
     return <LoginSignup key={page} page={page} navigate={navigate} />

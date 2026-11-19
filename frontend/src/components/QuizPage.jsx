@@ -1,7 +1,7 @@
 import PawMark from '../components/PawMark'
 
 
-export default function QuizPage({ onHome, questions, answers, reviewing, setReviewing, error, update, review, }) {
+export default function QuizPage({ onHome, onViewMatches, questions, answers, reviewing, setReviewing, error, update, review, }) {
     return (
     <main className="quiz-page">
       <header className="auth-topbar">
@@ -18,8 +18,9 @@ export default function QuizPage({ onHome, questions, answers, reviewing, setRev
               <dd>{Array.isArray(answers[question.id]) ? answers[question.id].join(', ') || 'None selected' : answers[question.id]}</dd>
             </div>)}
           </dl>
-          <p className="form-notice" role="status">Your answers are ready to review. They haven’t been saved or sent to the shelter. Saving and cat matching are not available yet. Leaving this page clears your answers.</p>
+          <p className="form-notice" role="status"> No account is required to take the quiz. Your browser will try to keep your answers for this tab. Your answers have not been sent to the shelter. Cat matching is not available yet. </p>
           <button className="primary-button" type="button" onClick={() => setReviewing(false)}>Edit answers</button>
+          {onViewMatches && <button className="outline-button" type="button" onClick={onViewMatches}>View matches</button>}
         </> : <form onSubmit={review}>
           {questions.map((question, index) => <fieldset className="quiz-question" key={question.id}>
             <legend>Q{index}. {question.text}</legend>
